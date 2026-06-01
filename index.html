@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Медиаплан — DISKURS</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- SheetJS for Excel export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- jsPDF for PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<style>
+/* ─── RESET & BASE ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:         #0D0F1A;
+  --surface:    #14172A;
+  --surface2:   #1C2035;
+  --border:     #2A2F4A;
+  --border2:    #363C5E;
+
+  --accent:     #6C63FF;
+  --accent2:    #A78BFA;
+  --accent-glow: rgba(108,99,255,0.25);
+
+  --meta:       #1877F2;
+  --meta-bg:    rgba(24,119,242,0.12);
+  --google:     #34A853;
+  --google-bg:  rgba(52,168,83,0.12);
+  --tiktok:     #EE1D52;
+  --tiktok-bg:  rgba(238,29,82,0.12);
+  --yandex:     #FFCC00;
+  --yandex-bg:  rgba(255,204,0,0.10);
+  --custom:     #A78BFA;
+  --custom-bg:  rgba(167,139,250,0.12);
+
+  --text:       #E8EAF6;
+  --text2:      #9CA3C4;
+  --text3:      #5C6288;
+
+  --success:    #34A853;
+  --warning:    #FFCC00;
+  --danger:     #EE1D52;
+
+  --font-head:  'Unbounded', sans-serif;
+  --font-body:  'Golos Text', sans-serif;
+
+  --radius:     12px;
+  --radius-sm:  8px;
+  --transition: 0.2s ease;
+}
+
+html { font-size: 15px; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* ─── NOISE TEXTURE ─── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── LAYOUT ─── */
+.app-shell {
+  position: relative;
+  z-index: 1;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+/* ─── HEADER ─── */
+.app-header {
+  padding: 40px 0 32px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 36px;
+}
+.header-left h1 {
+  font-family: var(--font-head);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #fff 30%, var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+}
+.header-left p {
+  color: var(--text3);
+  font-size: 0.82rem;
+  margin-top: 4px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.header-badge {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  font-size: 0.75rem;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-family: var(--font-head);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* ─── SECTIONS ─── */
+.section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.section-header {
+  padding: 16px 22px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--transition);
+}
+.section-header:hover { background: #202440; }
+.section-icon {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  display: grid; place-items: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.section-title {
+  font-family: var(--font-head);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--text);
+}
+.section-toggle {
+  margin-left: auto;
+  color: var(--text3);
+  transition: transform var(--transition);
+  font-size: 0.75rem;
+}
+.section.collapsed .section-toggle { transform: rotate(-90deg); }
+.section.collapsed .section-body { display: none; }
+.section-body { padding: 22px; }
+
+/* ─── GRID LAYOUTS ─── */
+.form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.form-grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 14px; }
+.span-2 { grid-column: span 2; }
+.span-full { grid-column: 1 / -1; }
+
+/* ─── FORM FIELDS ─── */
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text2);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.field label .req { color: var(--accent2); margin-left: 2px; }
+
+input, select, textarea {
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  width: 100%;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+input::placeholder, textarea::placeholder { color: var(--text3); }
+select option { background: #1C2035; }
+textarea { resize: vertical; min-height: 80px; }
+
+input[type="number"] { -moz-appearance: textfield; }
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+/* ─── PLATFORMS GRID ─── */
+.platforms-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.platform-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color var(--transition);
+}
+.platform-card:hover { border-color: var(--border2); }
+
+.platform-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  user-select: none;
+}
+.platform-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.platform-name {
+  font-family: var(--font-head);
+  font-size: 0.78rem;
+  font-weight: 600;
+  flex: 1;
+}
+.platform-budget-preview {
+  font-size: 0.8rem;
+  color: var(--text3);
+  font-variant-numeric: tabular-nums;
+}
+.platform-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.btn-icon {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text2);
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: grid; place-items: center;
+  font-size: 0.85rem;
+  transition: all var(--transition);
+}
+.btn-icon:hover { background: var(--surface2); color: var(--text); }
+.btn-icon.danger:hover { border-color: var(--danger); color: var(--danger); }
+
+.platform-fields {
+  padding: 16px;
+  border-top: 1px solid var(--border);
+  display: none;
+}
+.platform-card.open .platform-fields { display: block; }
+
+/* ─── CAMPAIGNS within platform ─── */
+.campaigns-list { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+.campaign-row {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+}
+.campaign-row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.campaign-num {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text3);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ─── ADD BUTTONS ─── */
+.btn-add {
+  background: transparent;
+  border: 1px dashed var(--border2);
+  color: var(--text2);
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  cursor: pointer;
+  width: 100%;
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.btn-add:hover {
+  border-color: var(--accent);
+  color: var(--accent2);
+  background: var(--accent-glow);
+}
+
+/* ─── EXCHANGE RATE ─── */
+.rate-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+}
+.rate-value {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--warning);
+}
+.rate-label { color: var(--text3); font-size: 0.82rem; }
+.rate-input-wrap { flex: 1; }
+
+/* ─── SUMMARY BAR ─── */
+.summary-bar {
+  position: sticky;
+  bottom: 20px;
+  z-index: 100;
+  background: rgba(20,23,42,0.92);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(108,99,255,0.15);
+  margin-top: 32px;
+}
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.summary-label {
+  font-size: 0.68rem;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+.summary-value {
+  font-family: var(--font-head);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.summary-value.accent { color: var(--accent2); }
+.summary-divider {
+  width: 1px;
+  height: 32px;
+  background: var(--border);
+}
+.summary-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 10px;
+}
+
+/* ─── EXPORT BUTTONS ─── */
+.btn-export {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-head);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+.btn-export.excel {
+  background: linear-gradient(135deg, #1D6F42, #34A853);
+  color: #fff;
+}
+.btn-export.excel:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(52,168,83,0.4);
+}
+.btn-export.pdf {
+  background: linear-gradient(135deg, #C62828, #EE1D52);
+  color: #fff;
+}
+.btn-export.pdf:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(238,29,82,0.4);
+}
+.btn-export:active { transform: translateY(0); }
+
+/* ─── PREVIEW SECTION ─── */
+#preview-section {
+  display: none;
+  margin-top: 32px;
+}
+#preview-section.visible { display: block; }
+
+/* ─── TOAST ─── */
+.toast {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 9999;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  transform: translateX(120%);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  font-size: 0.88rem;
+  max-width: 320px;
+}
+.toast.show { transform: translateX(0); }
+.toast.success { border-color: var(--success); }
+.toast.error { border-color: var(--danger); }
+
+/* ─── PLATFORM ADD PANEL ─── */
+.add-platform-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+.platform-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text2);
+  text-align: center;
+}
+.platform-chip:hover { border-color: var(--accent); color: var(--text); background: var(--accent-glow); }
+.platform-chip .chip-icon { font-size: 1.4rem; }
+.platform-chip.added { border-color: var(--border2); opacity: 0.4; pointer-events: none; }
+
+/* ─── SEMANTIC LIST ─── */
+.keywords-wrap textarea {
+  min-height: 120px;
+  font-family: monospace;
+  font-size: 0.82rem;
+  line-height: 1.7;
+}
+.keywords-hint {
+  font-size: 0.75rem;
+  color: var(--text3);
+  margin-top: 4px;
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 680px) {
+  .form-grid-2, .form-grid-3, .form-grid-4 {
+    grid-template-columns: 1fr;
+  }
+  .span-2 { grid-column: span 1; }
+  .summary-bar { flex-wrap: wrap; }
+  .add-platform-grid { grid-template-columns: repeat(3, 1fr); }
+  .app-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+}
+
+/* ─── LOADING SPINNER ─── */
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: none;
+}
+.btn-export.loading .spinner { display: block; }
+.btn-export.loading .btn-label { display: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── DIVIDER ─── */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 18px 0;
+}
+
+/* ─── SCROLL STYLE ─── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="header-left">
+      <h1>Генератор медиаплана</h1>
+      <p>DISKURS · Performance Department</p>
+    </div>
+    <div class="header-badge">v2.0</div>
+  </header>
+
+  <!-- SECTION: Клиент -->
+  <div class="section" id="sec-client">
+    <div class="section-header" onclick="toggleSection('sec-client')">
+      <div class="section-icon" style="background:rgba(108,99,255,0.15)">👤</div>
+      <span class="section-title">Клиент и кампания</span>
+      <span class="section-toggle">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="form-grid-2">
+        <div class="field">
+          <label>Клиент <span class="req">*</span></label>
+          <input type="text" id="client" placeholder="Название компании" oninput="updateSummary()">
+        </div>
+        <div class="field">
+          <label>Бренд</label>
+          <input type="text" id="brand" placeholder="Название бренда (если отличается)">
+        </div>
+        <div class="field">
+          <label>Партнёр / агентство</label>
+          <input type="text" id="agency" value="DISKURS">
+        </div>
+        <div class="field">
+          <label>Регион показа <span class="req">*</span></label>
+          <input type="text" id="region" placeholder="Алматы" value="Алматы">
+        </div>
+        <div class="field span-2">
+          <label>Вид услуги</label>
+          <input type="text" id="service" placeholder="Таргетированная реклама, контекстная реклама, TikTok">
+        </div>
+        <div class="field">
+          <label>Сайт</label>
+          <input type="url" id="website" placeholder="https://example.com">
+        </div>
+        <div class="field">
+          <label>Instagram</label>
+          <input type="url" id="instagram" placeholder="https://instagram.com/...">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: Период и курс -->
+  <div class="section" id="sec-period">
+    <div class="section-header" onclick="toggleSection('sec-period')">
+      <div class="section-icon" style="background:rgba(255,204,0,0.12)">📅</div>
+      <span class="section-title">Период и бюджет</span>
+      <span class="section-toggle">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="form-grid-4">
+        <div class="field">
+          <label>Начало кампании <span class="req">*</span></label>
+          <input type="date" id="date-start" oninput="updateSummary()">
+        </div>
+        <div class="field">
+          <label>Окончание кампании <span class="req">*</span></label>
+          <input type="date" id="date-end" oninput="updateSummary()">
+        </div>
+        <div class="field">
+          <label>Длительность</label>
+          <div class="rate-display" style="min-height:42px">
+            <span class="rate-value" id="duration-display">—</span>
+            <span class="rate-label">дней</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Курс USD/KZT <span class="req">*</span></label>
+          <input type="number" id="usd-rate" value="463.20" step="0.01" min="1" oninput="updateSummary()">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: Платформы -->
+  <div class="section" id="sec-platforms">
+    <div class="section-header" onclick="toggleSection('sec-platforms')">
+      <div class="section-icon" style="background:rgba(108,99,255,0.15)">📡</div>
+      <span class="section-title">Платформы и кампании</span>
+      <span class="section-toggle">▼</span>
+    </div>
+    <div class="section-body">
+
+      <div class="platforms-grid" id="platforms-grid">
+        <!-- Platform cards inserted here -->
+      </div>
+
+      <div class="divider"></div>
+
+      <div style="margin-bottom:10px;font-size:0.78rem;color:var(--text3);font-weight:600;letter-spacing:0.04em;text-transform:uppercase;">Добавить платформу</div>
+      <div class="add-platform-grid" id="platform-chips">
+        <!-- chips inserted by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: Семантика -->
+  <div class="section collapsed" id="sec-semantic">
+    <div class="section-header" onclick="toggleSection('sec-semantic')">
+      <div class="section-icon" style="background:rgba(52,168,83,0.12)">🔑</div>
+      <span class="section-title">Семантическое ядро (Google)</span>
+      <span class="section-toggle">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="form-grid-2">
+        <div class="field span-full keywords-wrap">
+          <label>Ключевые слова</label>
+          <textarea id="keywords" placeholder="Каждое ключевое слово с новой строки:&#10;иппп алматы&#10;анализы на иппп&#10;сдать анализы на иппп&#10;..."></textarea>
+          <div class="keywords-hint">Каждое ключевое слово — с новой строки. Для минус-слов добавьте «-» в начале: <code>-бесплатно</code></div>
+        </div>
+        <div class="field">
+          <label>Тип соответствия по умолчанию</label>
+          <select id="match-type">
+            <option value="Фразовое">Фразовое</option>
+            <option value="Точное">Точное</option>
+            <option value="Широкое">Широкое</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Комментарий к ядру</label>
+          <input type="text" id="sem-comment" placeholder="Например: собрано через Wordstat, июнь 2026">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: Комментарий -->
+  <div class="section collapsed" id="sec-notes">
+    <div class="section-header" onclick="toggleSection('sec-notes')">
+      <div class="section-icon" style="background:rgba(167,139,250,0.12)">📝</div>
+      <span class="section-title">Примечания и дисклеймер</span>
+      <span class="section-toggle">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="field">
+        <label>Примечание для клиента</label>
+        <textarea id="notes" placeholder="Прогнозные показатели носят ориентировочный характер...">Прогнозные показатели (CTR, CR, конверсии) носят ориентировочный характер и основаны на средних бенчмарках по нише. Фактические результаты зависят от качества посадочных страниц, сезонности и конкурентной среды. Курс USD/KZT актуален на дату составления медиаплана.</textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- STICKY SUMMARY BAR -->
+  <div class="summary-bar">
+    <div class="summary-item">
+      <span class="summary-label">Бюджет $</span>
+      <span class="summary-value accent" id="sum-usd">0</span>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-item">
+      <span class="summary-label">Бюджет ₸</span>
+      <span class="summary-value" id="sum-kzt">0</span>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-item">
+      <span class="summary-label">Показов</span>
+      <span class="summary-value" id="sum-imp">0</span>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-item">
+      <span class="summary-label">Конверсий</span>
+      <span class="summary-value" id="sum-conv">0</span>
+    </div>
+    <div class="summary-actions">
+      <button class="btn-export excel" onclick="exportExcel(this)">
+        <span class="btn-label">⬇ Excel</span>
+        <div class="spinner"></div>
+      </button>
+      <button class="btn-export pdf" onclick="exportPDF(this)">
+        <span class="btn-label">⬇ PDF</span>
+        <div class="spinner"></div>
+      </button>
+    </div>
+  </div>
+
+</div><!-- /app-shell -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- HIDDEN PRINT AREA for PDF -->
+<div id="pdf-render" style="position:fixed;left:-9999px;top:0;width:1100px;background:#fff;font-family:'Golos Text',sans-serif;z-index:-1;"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA MODEL
+// ═══════════════════════════════════════════════════════════════
+const PLATFORMS = [
+  { id: 'meta',    name: 'Meta (Facebook / Instagram)', color: '#1877F2', bg: 'rgba(24,119,242,0.12)', icon: '📘',
+    defaultUnit: '1 000 показов', defaultType: 'Конверсии с сайта' },
+  { id: 'google',  name: 'Google Ads',                  color: '#34A853', bg: 'rgba(52,168,83,0.12)',   icon: '🔍',
+    defaultUnit: '1 клик',        defaultType: 'Поисковые кампании' },
+  { id: 'tiktok',  name: 'TikTok Ads',                  color: '#EE1D52', bg: 'rgba(238,29,82,0.12)',   icon: '🎵',
+    defaultUnit: '1 000 показов', defaultType: 'Конверсии с сайта' },
+  { id: 'yandex',  name: 'Яндекс.Директ',               color: '#FFCC00', bg: 'rgba(255,204,0,0.10)',   icon: '🟡',
+    defaultUnit: '1 клик',        defaultType: 'Поисковые кампании' },
+  { id: 'custom',  name: 'Другая платформа',             color: '#A78BFA', bg: 'rgba(167,139,250,0.12)', icon: '🛠',
+    defaultUnit: '1 000 показов', defaultType: 'Кампания' },
+];
+
+const CAMPAIGN_TYPES = [
+  'Конверсии с сайта','Трафик на сайт','Трафик на магазин Kaspi',
+  'Лиды (Lead Ads)','Охват и узнаваемость','Просмотры видео',
+  'Поисковые кампании','Торговые кампании','Ретаргетинг','Другое',
+];
+const UNITS = ['1 000 показов','1 клик','1 день','1 000 просмотров'];
+const LANGS = ['Русский','Казахский','English','Русский + Казахский'];
+
+let addedPlatforms = []; // [{platformId, campaigns:[{...}]}]
+let platformCounter = 0;
+let campaignCounter = 0;
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  // Set today as default start, +30d as end
+  const today = new Date();
+  const end = new Date(today); end.setDate(end.getDate() + 29);
+  document.getElementById('date-start').value = fmtDateInput(today);
+  document.getElementById('date-end').value = fmtDateInput(end);
+
+  renderPlatformChips();
+
+  // Add Meta and Google by default
+  addPlatform('meta');
+  addPlatform('google');
+
+  updateSummary();
+});
+
+function fmtDateInput(d) {
+  return d.toISOString().split('T')[0];
+}
+function fmtDateDisplay(str) {
+  if (!str) return '—';
+  const [y,m,d] = str.split('-');
+  return `${d}.${m}.${y}`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SECTION TOGGLE
+// ═══════════════════════════════════════════════════════════════
+function toggleSection(id) {
+  document.getElementById(id).classList.toggle('collapsed');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PLATFORM CHIPS
+// ═══════════════════════════════════════════════════════════════
+function renderPlatformChips() {
+  const container = document.getElementById('platform-chips');
+  container.innerHTML = PLATFORMS.map(p => `
+    <div class="platform-chip ${addedPlatforms.find(ap=>ap.platformId===p.id)?'added':''}"
+         id="chip-${p.id}" onclick="addPlatform('${p.id}')">
+      <span class="chip-icon">${p.icon}</span>
+      <span>${p.name.split(' ')[0]}</span>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ADD PLATFORM
+// ═══════════════════════════════════════════════════════════════
+function addPlatform(platformId) {
+  if (addedPlatforms.find(ap => ap.platformId === platformId)) {
+    showToast('Платформа уже добавлена', 'error'); return;
+  }
+  const pDef = PLATFORMS.find(p => p.id === platformId);
+  const pid = ++platformCounter;
+  const firstCampaign = makeCampaign(pDef);
+  addedPlatforms.push({ platformId, pid, campaigns: [firstCampaign] });
+  renderPlatforms();
+  renderPlatformChips();
+  updateSummary();
+}
+
+function makeCampaign(pDef) {
+  return {
+    cid: ++campaignCounter,
+    type: pDef.defaultType,
+    audience: 'Алматы',
+    lang: 'Русский',
+    unit: pDef.defaultUnit,
+    rate: '',
+    qty: '',
+    imp: '',
+    clicks: '',
+    ctr: '',
+    cr: '',
+    conversions: '',
+  };
+}
+
+function removePlatform(pid) {
+  addedPlatforms = addedPlatforms.filter(ap => ap.pid !== pid);
+  renderPlatforms();
+  renderPlatformChips();
+  updateSummary();
+}
+
+function addCampaign(pid) {
+  const ap = addedPlatforms.find(p => p.pid === pid);
+  const pDef = PLATFORMS.find(p => p.id === ap.platformId);
+  ap.campaigns.push(makeCampaign(pDef));
+  renderPlatforms();
+  updateSummary();
+}
+
+function removeCampaign(pid, cid) {
+  const ap = addedPlatforms.find(p => p.pid === pid);
+  if (ap.campaigns.length === 1) { showToast('Нельзя удалить единственную кампанию', 'error'); return; }
+  ap.campaigns = ap.campaigns.filter(c => c.cid !== cid);
+  renderPlatforms();
+  updateSummary();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER PLATFORMS
+// ═══════════════════════════════════════════════════════════════
+function renderPlatforms() {
+  const grid = document.getElementById('platforms-grid');
+  grid.innerHTML = addedPlatforms.map(ap => {
+    const pDef = PLATFORMS.find(p => p.id === ap.platformId);
+    const totalBudget = ap.campaigns.reduce((s, c) => {
+      const r = parseFloat(c.rate) || 0;
+      const q = parseFloat(c.qty) || 0;
+      return s + r * q;
+    }, 0);
+    const budgetStr = totalBudget > 0 ? `$${fmt(totalBudget)}` : '';
+
+    return `
+    <div class="platform-card open" id="pcard-${ap.pid}">
+      <div class="platform-header">
+        <div class="platform-dot" style="background:${pDef.color}"></div>
+        <span class="platform-name" style="color:${pDef.color}">${pDef.icon} ${pDef.name}</span>
+        <span class="platform-budget-preview">${budgetStr}</span>
+        <div class="platform-actions">
+          <button class="btn-icon" onclick="togglePlatformCard(${ap.pid})" title="Свернуть">▲</button>
+          <button class="btn-icon danger" onclick="removePlatform(${ap.pid})" title="Удалить">✕</button>
+        </div>
+      </div>
+      <div class="platform-fields" style="background:${pDef.bg}">
+        <div class="campaigns-list">
+          ${ap.campaigns.map((c, idx) => renderCampaignRow(ap.pid, c, idx + 1, pDef)).join('')}
+        </div>
+        <button class="btn-add" onclick="addCampaign(${ap.pid})">+ Добавить кампанию</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function togglePlatformCard(pid) {
+  const card = document.getElementById(`pcard-${pid}`);
+  card.classList.toggle('open');
+  const btn = card.querySelector('.platform-header .btn-icon:first-child');
+  btn.textContent = card.classList.contains('open') ? '▲' : '▼';
+}
+
+function renderCampaignRow(pid, c, num, pDef) {
+  const typeOpts = CAMPAIGN_TYPES.map(t =>
+    `<option value="${t}" ${c.type===t?'selected':''}>${t}</option>`).join('');
+  const unitOpts = UNITS.map(u =>
+    `<option value="${u}" ${c.unit===u?'selected':''}>${u}</option>`).join('');
+  const langOpts = LANGS.map(l =>
+    `<option value="${l}" ${c.lang===l?'selected':''}>${l}</option>`).join('');
+
+  return `
+  <div class="campaign-row" id="crow-${c.cid}">
+    <div class="campaign-row-header">
+      <span class="campaign-num">Кампания ${num}</span>
+      <button class="btn-icon danger" onclick="removeCampaign(${pid},${c.cid})" title="Удалить">✕</button>
+    </div>
+    <div class="form-grid-4">
+      <div class="field span-2">
+        <label>Тип кампании</label>
+        <select onchange="updateCField(${pid},${c.cid},'type',this.value)">${typeOpts}</select>
+      </div>
+      <div class="field">
+        <label>Аудитория / ГЕО</label>
+        <input type="text" value="${c.audience}" onchange="updateCField(${pid},${c.cid},'audience',this.value)" placeholder="Алматы, 25–45">
+      </div>
+      <div class="field">
+        <label>Язык</label>
+        <select onchange="updateCField(${pid},${c.cid},'lang',this.value)">${langOpts}</select>
+      </div>
+      <div class="field">
+        <label>Формат закупки</label>
+        <select onchange="updateCField(${pid},${c.cid},'unit',this.value)">${unitOpts}</select>
+      </div>
+      <div class="field">
+        <label>Ставка, $</label>
+        <input type="number" value="${c.rate}" step="0.01" min="0" placeholder="0.00"
+          oninput="updateCField(${pid},${c.cid},'rate',this.value);updateSummary()">
+      </div>
+      <div class="field">
+        <label>Кол-во единиц</label>
+        <input type="number" value="${c.qty}" step="1" min="0" placeholder="0"
+          oninput="updateCField(${pid},${c.cid},'qty',this.value);updateSummary()">
+      </div>
+      <div class="field">
+        <label>Бюджет, $</label>
+        <div class="rate-display" style="min-height:42px">
+          <span class="rate-value" id="budget-${c.cid}" style="font-size:0.9rem">
+            ${calcBudget(c)}
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="form-grid-4" style="margin-top:10px">
+      <div class="field">
+        <label>Прогноз показов</label>
+        <input type="number" value="${c.imp}" step="100" min="0" placeholder="0"
+          oninput="updateCField(${pid},${c.cid},'imp',this.value);updateSummary()">
+      </div>
+      <div class="field">
+        <label>Прогноз кликов</label>
+        <input type="number" value="${c.clicks}" step="10" min="0" placeholder="0"
+          oninput="updateCField(${pid},${c.cid},'clicks',this.value);updateSummary()">
+      </div>
+      <div class="field">
+        <label>CTR, %</label>
+        <input type="number" value="${c.ctr}" step="0.001" min="0" max="100" placeholder="0.00"
+          oninput="updateCField(${pid},${c.cid},'ctr',this.value)">
+      </div>
+      <div class="field">
+        <label>CR, %</label>
+        <input type="number" value="${c.cr}" step="0.1" min="0" max="100" placeholder="0.00"
+          oninput="updateCField(${pid},${c.cid},'cr',this.value)">
+      </div>
+      <div class="field">
+        <label>Конверсий (прогноз)</label>
+        <input type="number" value="${c.conversions}" step="1" min="0" placeholder="0"
+          oninput="updateCField(${pid},${c.cid},'conversions',this.value);updateSummary()">
+      </div>
+    </div>
+  </div>`;
+}
+
+function calcBudget(c) {
+  const r = parseFloat(c.rate) || 0;
+  const q = parseFloat(c.qty) || 0;
+  const b = r * q;
+  return b > 0 ? '$' + fmt(b) : '—';
+}
+
+function updateCField(pid, cid, field, value) {
+  const ap = addedPlatforms.find(p => p.pid === pid);
+  const campaign = ap.campaigns.find(c => c.cid === cid);
+  campaign[field] = value;
+  // Update budget display
+  const budgetEl = document.getElementById(`budget-${cid}`);
+  if (budgetEl) budgetEl.textContent = calcBudget(campaign);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SUMMARY
+// ═══════════════════════════════════════════════════════════════
+function updateSummary() {
+  // Duration
+  const ds = document.getElementById('date-start').value;
+  const de = document.getElementById('date-end').value;
+  if (ds && de) {
+    const diff = Math.round((new Date(de) - new Date(ds)) / 86400000) + 1;
+    document.getElementById('duration-display').textContent = diff > 0 ? diff : '—';
+  }
+
+  const rate = parseFloat(document.getElementById('usd-rate').value) || 463.2;
+
+  let totalUSD = 0, totalImp = 0, totalConv = 0;
+  addedPlatforms.forEach(ap => {
+    ap.campaigns.forEach(c => {
+      totalUSD += (parseFloat(c.rate) || 0) * (parseFloat(c.qty) || 0);
+      totalImp  += parseFloat(c.imp) || 0;
+      totalConv += parseFloat(c.conversions) || 0;
+    });
+  });
+
+  document.getElementById('sum-usd').textContent = '$' + fmt(totalUSD);
+  document.getElementById('sum-kzt').textContent = fmt(Math.round(totalUSD * rate)) + ' ₸';
+  document.getElementById('sum-imp').textContent = fmtBig(totalImp);
+  document.getElementById('sum-conv').textContent = fmt(totalConv);
+}
+
+function fmt(n) {
+  return Number(n).toLocaleString('ru-RU', {maximumFractionDigits: 2});
+}
+function fmtBig(n) {
+  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n/1000).toFixed(0) + 'K';
+  return String(n);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// COLLECT DATA
+// ═══════════════════════════════════════════════════════════════
+function collectData() {
+  const ds = document.getElementById('date-start').value;
+  const de = document.getElementById('date-end').value;
+  const rate = parseFloat(document.getElementById('usd-rate').value) || 463.2;
+  const dur = ds && de ? Math.round((new Date(de)-new Date(ds))/86400000)+1 : 0;
+
+  return {
+    client:    document.getElementById('client').value || '—',
+    brand:     document.getElementById('brand').value,
+    agency:    document.getElementById('agency').value || 'DISKURS',
+    region:    document.getElementById('region').value || 'Алматы',
+    service:   document.getElementById('service').value,
+    website:   document.getElementById('website').value,
+    instagram: document.getElementById('instagram').value,
+    dateStart: ds, dateEnd: de, duration: dur, rate,
+    keywords:  document.getElementById('keywords').value,
+    matchType: document.getElementById('match-type').value,
+    semComment: document.getElementById('sem-comment').value,
+    notes:     document.getElementById('notes').value,
+    platforms: addedPlatforms.map(ap => {
+      const pDef = PLATFORMS.find(p => p.id === ap.platformId);
+      return {
+        name: pDef.id === 'custom'
+          ? (ap.campaigns[0]?.customName || pDef.name)
+          : pDef.name,
+        color: pDef.color,
+        campaigns: ap.campaigns.map(c => {
+          const budget = (parseFloat(c.rate)||0) * (parseFloat(c.qty)||0);
+          return {
+            type: c.type,
+            audience: c.audience,
+            lang: c.lang,
+            unit: c.unit,
+            rate: parseFloat(c.rate) || 0,
+            qty: parseFloat(c.qty) || 0,
+            budget,
+            budgetKzt: Math.round(budget * rate),
+            dailyBudget: dur > 0 ? budget / dur : 0,
+            imp: parseInt(c.imp) || 0,
+            clicks: parseInt(c.clicks) || 0,
+            ctr: parseFloat(c.ctr) || 0,
+            cr: parseFloat(c.cr) || 0,
+            conversions: parseInt(c.conversions) || 0,
+            cpc: (parseInt(c.clicks)||0) > 0 ? budget / parseInt(c.clicks) : 0,
+            cpl: (parseInt(c.conversions)||0) > 0 ? budget / parseInt(c.conversions) : 0,
+          };
+        })
+      };
+    })
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EXCEL EXPORT
+// ═══════════════════════════════════════════════════════════════
+async function exportExcel(btn) {
+  if (!validate()) return;
+  btn.classList.add('loading');
+  await sleep(50);
+  try {
+    const d = collectData();
+    const wb = XLSX.utils.book_new();
+
+    // ── Sheet 1: Медиаплан ──────────────────────────────────────
+    const rows = [];
+
+    // Title
+    rows.push([`МЕДИАПЛАН — ${d.client}`, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']);
+    rows.push([`Клиент: ${d.client}`, '', '', '', `Период: ${fmtDateDisplay(d.dateStart)} – ${fmtDateDisplay(d.dateEnd)}`, '', '', '', `Регион: ${d.region}`, '', '', '', `Курс USD/KZT: ${d.rate}`, '']);
+    rows.push([]); // spacer
+
+    // Header row
+    const hdr = ['№','Платформа','Тип кампании','Аудитория / ГЕО','Язык',
+      'Начало','Конец','Длит.','Формат закупки','Ставка, $','Кол-во единиц',
+      'Бюджет, $','Бюджет, ₸','Дн. бюджет, $',
+      'Прогноз показов','Прогноз кликов','CTR, %','CPC, $','CR, %','Конверсий','CPL, $'];
+    rows.push(hdr);
+
+    let rowNum = 1;
+    let totBudget=0, totBudgetKzt=0, totDaily=0, totImp=0, totClicks=0, totConv=0;
+
+    d.platforms.forEach(pl => {
+      // Platform group header
+      rows.push([`${pl.name}`, ...Array(20).fill('')]);
+
+      pl.campaigns.forEach(c => {
+        rows.push([
+          rowNum++, pl.name, c.type, c.audience, c.lang,
+          fmtDateDisplay(d.dateStart), fmtDateDisplay(d.dateEnd), d.duration, c.unit,
+          c.rate, c.qty,
+          c.budget, c.budgetKzt, +c.dailyBudget.toFixed(2),
+          c.imp, c.clicks, +(c.ctr/100).toFixed(5), +c.cpc.toFixed(2), +(c.cr/100).toFixed(4),
+          c.conversions, +c.cpl.toFixed(2)
+        ]);
+        totBudget += c.budget; totBudgetKzt += c.budgetKzt;
+        totDaily += c.dailyBudget; totImp += c.imp; totClicks += c.clicks;
+        totConv += c.conversions;
+      });
+    });
+
+    // Totals
+    const avgCTR = totClicks > 0 && totImp > 0 ? totClicks/totImp : 0;
+    const avgCPC = totClicks > 0 ? totBudget/totClicks : 0;
+    const avgCR  = totClicks > 0 ? totConv/totClicks : 0;
+    const avgCPL = totConv > 0 ? totBudget/totConv : 0;
+    rows.push([
+      'ИТОГО','','','','','','','','','', '',
+      +totBudget.toFixed(2), Math.round(totBudgetKzt), +totDaily.toFixed(2),
+      totImp, totClicks, +avgCTR.toFixed(5), +avgCPC.toFixed(2), +avgCR.toFixed(4),
+      totConv, +avgCPL.toFixed(2)
+    ]);
+
+    rows.push([]); // spacer
+    if (d.notes) rows.push([`* ${d.notes}`]);
+
+    const ws1 = XLSX.utils.aoa_to_sheet(rows);
+
+    // Column widths
+    ws1['!cols'] = [
+      {wch:4},{wch:22},{wch:26},{wch:18},{wch:12},
+      {wch:12},{wch:12},{wch:8},{wch:18},{wch:10},{wch:12},
+      {wch:12},{wch:14},{wch:13},
+      {wch:14},{wch:13},{wch:8},{wch:9},{wch:8},{wch:10},{wch:9}
+    ];
+    XLSX.utils.book_append_sheet(wb, ws1, 'Медиаплан');
+
+    // ── Sheet 2: Семантика ──────────────────────────────────────
+    if (d.keywords.trim()) {
+      const semRows = [['№','Ключевое слово','Тип соответствия','Статус','Комментарий']];
+      const kws = d.keywords.split('\n').filter(k => k.trim());
+      kws.forEach((kw, i) => {
+        const isNeg = kw.trim().startsWith('-');
+        semRows.push([
+          i+1,
+          kw.trim().replace(/^-/,''),
+          isNeg ? 'Минус-слово' : d.matchType,
+          isNeg ? 'Минус-слово' : 'Активен',
+          i === 0 ? d.semComment : ''
+        ]);
+      });
+      const ws2 = XLSX.utils.aoa_to_sheet(semRows);
+      ws2['!cols'] = [{wch:4},{wch:38},{wch:16},{wch:14},{wch:30}];
+      XLSX.utils.book_append_sheet(wb, ws2, 'Семантика');
+    }
+
+    // ── Sheet 3: Настройки ──────────────────────────────────────
+    const cfgRows = [
+      ['НАСТРОЙКИ'],
+      ['Клиент', d.client],
+      ['Бренд', d.brand],
+      ['Агентство', d.agency],
+      ['Регион', d.region],
+      ['Сайт', d.website],
+      ['Instagram', d.instagram],
+      ['Начало', fmtDateDisplay(d.dateStart)],
+      ['Конец', fmtDateDisplay(d.dateEnd)],
+      ['Длительность (дн.)', d.duration],
+      ['Курс USD/KZT', d.rate],
+    ];
+    const ws3 = XLSX.utils.aoa_to_sheet(cfgRows);
+    ws3['!cols'] = [{wch:22},{wch:40}];
+    XLSX.utils.book_append_sheet(wb, ws3, 'Настройки');
+
+    const filename = `Медиаплан_${d.client.replace(/\s+/g,'_')}_${fmtDateDisplay(d.dateStart).replace(/\./g,'-')}.xlsx`;
+    XLSX.writeFile(wb, filename);
+    showToast('✅ Excel готов — файл скачан', 'success');
+  } catch(e) {
+    showToast('Ошибка при создании Excel: ' + e.message, 'error');
+    console.error(e);
+  }
+  btn.classList.remove('loading');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PDF EXPORT
+// ═══════════════════════════════════════════════════════════════
+async function exportPDF(btn) {
+  if (!validate()) return;
+  btn.classList.add('loading');
+  await sleep(100);
+  try {
+    const d = collectData();
+    const el = document.getElementById('pdf-render');
+    el.innerHTML = buildPDFHTML(d);
+    el.style.left = '0';
+    el.style.top = '0';
+    el.style.zIndex = '9999';
+    el.style.display = 'block';
+
+    await sleep(300);
+
+    const canvas = await html2canvas(el, {
+      scale: 1.8,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      windowWidth: 1100,
+    });
+
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const imgW = canvas.width;
+    const imgH = canvas.height;
+    const ratio = pageW / imgW;
+    const scaledH = imgH * ratio;
+
+    if (scaledH <= pageH) {
+      pdf.addImage(imgData, 'JPEG', 0, 0, pageW, scaledH);
+    } else {
+      // Multi-page
+      let y = 0;
+      while (y < imgH) {
+        const sliceH = Math.min(pageH / ratio, imgH - y);
+        const sliceCanvas = document.createElement('canvas');
+        sliceCanvas.width = imgW;
+        sliceCanvas.height = sliceH;
+        const ctx = sliceCanvas.getContext('2d');
+        ctx.drawImage(canvas, 0, y, imgW, sliceH, 0, 0, imgW, sliceH);
+        const sliceData = sliceCanvas.toDataURL('image/jpeg', 0.95);
+        if (y > 0) pdf.addPage();
+        pdf.addImage(sliceData, 'JPEG', 0, 0, pageW, sliceH * ratio);
+        y += sliceH;
+      }
+    }
+
+    const filename = `Медиаплан_${d.client.replace(/\s+/g,'_')}_${fmtDateDisplay(d.dateStart).replace(/\./g,'-')}.pdf`;
+    pdf.save(filename);
+    showToast('✅ PDF готов — файл скачан', 'success');
+  } catch(e) {
+    showToast('Ошибка при создании PDF: ' + e.message, 'error');
+    console.error(e);
+  }
+  const el = document.getElementById('pdf-render');
+  el.style.display = 'none';
+  el.style.left = '-9999px';
+  btn.classList.remove('loading');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PDF HTML BUILDER
+// ═══════════════════════════════════════════════════════════════
+function buildPDFHTML(d) {
+  const totalBudget = d.platforms.reduce((s,pl)=>s+pl.campaigns.reduce((ss,c)=>ss+c.budget,0),0);
+  const totalBudgetKzt = d.platforms.reduce((s,pl)=>s+pl.campaigns.reduce((ss,c)=>ss+c.budgetKzt,0),0);
+  const totalImp = d.platforms.reduce((s,pl)=>s+pl.campaigns.reduce((ss,c)=>ss+c.imp,0),0);
+  const totalClicks = d.platforms.reduce((s,pl)=>s+pl.campaigns.reduce((ss,c)=>ss+c.clicks,0),0);
+  const totalConv = d.platforms.reduce((s,pl)=>s+pl.campaigns.reduce((ss,c)=>ss+c.conversions,0),0);
+  const avgCPC = totalClicks > 0 ? totalBudget/totalClicks : 0;
+  const avgCPL = totalConv > 0 ? totalBudget/totalConv : 0;
+
+  const pn = (n, dec=2) => (n||0).toLocaleString('ru-RU', {maximumFractionDigits:dec, minimumFractionDigits: dec});
+  const pi = (n) => (n||0).toLocaleString('ru-RU', {maximumFractionDigits:0});
+
+  const PCOLORS = { 'Meta (Facebook / Instagram)': '#1877F2', 'Google Ads': '#34A853', 'TikTok Ads': '#EE1D52', 'Яндекс.Директ': '#D4A800' };
+
+  let rowNum = 1;
+  const dataRows = d.platforms.flatMap(pl => {
+    const pColor = PCOLORS[pl.name] || '#7C6FCD';
+    const pBg = pColor + '18';
+    return [
+      // Platform header
+      `<tr><td colspan="21" style="background:${pColor};color:#fff;font-weight:700;font-size:11px;padding:7px 10px;letter-spacing:0.04em">${pl.name.toUpperCase()}</td></tr>`,
+      // Campaigns
+      ...pl.campaigns.map(c => `
+        <tr style="background:${pBg}">
+          <td style="text-align:center;color:#888">${rowNum++}</td>
+          <td style="color:${pColor};font-weight:600">${pl.name}</td>
+          <td>${c.type}</td>
+          <td>${c.audience}</td>
+          <td>${c.lang}</td>
+          <td style="text-align:center">${fmtDateDisplay(d.dateStart)}</td>
+          <td style="text-align:center">${fmtDateDisplay(d.dateEnd)}</td>
+          <td style="text-align:center">${d.duration}</td>
+          <td>${c.unit}</td>
+          <td style="text-align:right">${pn(c.rate,2)}</td>
+          <td style="text-align:right">${pi(c.qty)}</td>
+          <td style="text-align:right;font-weight:600">$${pn(c.budget)}</td>
+          <td style="text-align:right">${pi(c.budgetKzt)} ₸</td>
+          <td style="text-align:right">$${pn(c.dailyBudget)}</td>
+          <td style="text-align:right">${pi(c.imp)}</td>
+          <td style="text-align:right">${pi(c.clicks)}</td>
+          <td style="text-align:right">${pn(c.ctr,2)}%</td>
+          <td style="text-align:right">$${pn(c.cpc)}</td>
+          <td style="text-align:right">${pn(c.cr,1)}%</td>
+          <td style="text-align:right">${pi(c.conversions)}</td>
+          <td style="text-align:right">$${pn(c.cpl)}</td>
+        </tr>`)
+    ];
+  }).join('');
+
+  const avgCTR = totalClicks > 0 && totalImp > 0 ? (totalClicks/totalImp*100) : 0;
+  const avgCR  = totalClicks > 0 ? (totalConv/totalClicks*100) : 0;
+
+  return `
+  <div style="font-family:'Golos Text',Arial,sans-serif;font-size:10px;color:#1A1A2E;width:1080px;padding:24px 28px;background:#fff">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;padding-bottom:14px;border-bottom:2px solid #1A1A2E">
+      <div>
+        <div style="font-size:20px;font-weight:800;letter-spacing:-0.02em;color:#1A1A2E;line-height:1.1">МЕДИАПЛАН</div>
+        <div style="font-size:12px;color:#6C63FF;font-weight:600;margin-top:3px">${d.client}</div>
+      </div>
+      <div style="text-align:right;font-size:9px;color:#888;line-height:1.8">
+        <div>Период: <strong style="color:#1A1A2E">${fmtDateDisplay(d.dateStart)} — ${fmtDateDisplay(d.dateEnd)}</strong> (${d.duration} дн.)</div>
+        <div>Регион: <strong style="color:#1A1A2E">${d.region}</strong></div>
+        ${d.agency ? `<div>Агентство: <strong style="color:#1A1A2E">${d.agency}</strong></div>` : ''}
+        <div>Курс USD/KZT: <strong style="color:#1A1A2E">${d.rate}</strong></div>
+      </div>
+    </div>
+
+    <!-- KPI summary chips -->
+    <div style="display:flex;gap:10px;margin-bottom:16px">
+      ${[
+        ['Общий бюджет', `$${pn(totalBudget)}`, '#6C63FF'],
+        ['Бюджет в тенге', `${pi(totalBudgetKzt)} ₸`, '#1877F2'],
+        ['Прогноз показов', pi(totalImp), '#34A853'],
+        ['Прогноз кликов', pi(totalClicks), '#FFCC00'],
+        ['Прогноз конверсий', pi(totalConv), '#EE1D52'],
+        ['Средний CPC', `$${pn(avgCPC)}`, '#A78BFA'],
+        ['Средний CPL', `$${pn(avgCPL)}`, '#FF7043'],
+      ].map(([label, val, color]) => `
+        <div style="flex:1;background:${color}18;border:1px solid ${color}44;border-radius:8px;padding:8px 10px">
+          <div style="font-size:8px;color:#888;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px">${label}</div>
+          <div style="font-size:13px;font-weight:700;color:${color}">${val}</div>
+        </div>`).join('')}
+    </div>
+
+    <!-- Main table -->
+    <table style="width:100%;border-collapse:collapse;font-size:9px">
+      <thead>
+        <tr style="background:#1A1A2E;color:#fff">
+          ${['№','Платформа','Тип кампании','Аудитория','Язык','Начало','Конец','Дн.','Формат',
+            'Ставка','Кол-во','Бюджет $','Бюджет ₸','Дн.бюдж','Показы','Клики',
+            'CTR','CPC','CR','Конв.','CPL'].map(h =>
+            `<th style="padding:7px 5px;text-align:${['Ставка','Кол-во','Бюджет $','Бюджет ₸','Дн.бюдж','Показы','Клики','CTR','CPC','CR','Конв.','CPL'].includes(h)?'right':'left'};white-space:nowrap">${h}</th>`
+          ).join('')}
+        </tr>
+      </thead>
+      <tbody>
+        ${dataRows}
+        <!-- ИТОГО -->
+        <tr style="background:#1A1A2E;color:#fff;font-weight:700">
+          <td colspan="11" style="padding:8px 10px;font-size:10px">ИТОГО</td>
+          <td style="text-align:right;padding:8px 5px">$${pn(totalBudget)}</td>
+          <td style="text-align:right;padding:8px 5px">${pi(totalBudgetKzt)} ₸</td>
+          <td style="padding:8px 5px"></td>
+          <td style="text-align:right;padding:8px 5px">${pi(totalImp)}</td>
+          <td style="text-align:right;padding:8px 5px">${pi(totalClicks)}</td>
+          <td style="text-align:right;padding:8px 5px">${pn(avgCTR,2)}%</td>
+          <td style="text-align:right;padding:8px 5px">$${pn(avgCPC)}</td>
+          <td style="text-align:right;padding:8px 5px">${pn(avgCR,1)}%</td>
+          <td style="text-align:right;padding:8px 5px">${pi(totalConv)}</td>
+          <td style="text-align:right;padding:8px 5px">$${pn(avgCPL)}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    ${d.notes ? `<div style="margin-top:14px;padding:10px 14px;background:#F5F6FA;border-left:3px solid #6C63FF;border-radius:4px;font-size:8px;color:#666;line-height:1.6">* ${d.notes}</div>` : ''}
+
+    <div style="margin-top:14px;display:flex;justify-content:space-between;font-size:8px;color:#aaa;border-top:1px solid #eee;padding-top:10px">
+      <span>${d.agency} · Медиаплан сформирован автоматически</span>
+      <span>Дата создания: ${new Date().toLocaleDateString('ru-RU')}</span>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// VALIDATION
+// ═══════════════════════════════════════════════════════════════
+function validate() {
+  const client = document.getElementById('client').value.trim();
+  const ds = document.getElementById('date-start').value;
+  const de = document.getElementById('date-end').value;
+  if (!client) { showToast('Укажите название клиента', 'error'); return false; }
+  if (!ds || !de) { showToast('Укажите период кампании', 'error'); return false; }
+  if (new Date(de) < new Date(ds)) { showToast('Дата окончания раньше начала', 'error'); return false; }
+  if (addedPlatforms.length === 0) { showToast('Добавьте хотя бы одну платформу', 'error'); return false; }
+  return true;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.className = `toast ${type}`;
+  t.innerHTML = (type==='success'?'✅':'❌') + ` <span>${msg}</span>`;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+</script>
+</body>
+</html>
