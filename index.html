@@ -1,0 +1,1940 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Медиаплан — DISKURS</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ─── RESET ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* DISKURS brand palette */
+  --blue:        #1A6BFA;      /* primary blue */
+  --blue-dark:   #0D4FCC;      /* hover / pressed */
+  --blue-mid:    #3D85FF;      /* lighter accent */
+  --blue-light:  #EBF2FF;      /* tinted background */
+  --blue-xlight: #F4F8FF;      /* very light tint */
+  --blue-glow:   rgba(26,107,250,0.18);
+
+  --bg:          #F7F9FC;      /* page background */
+  --white:       #FFFFFF;
+  --surface:     #FFFFFF;
+  --surface2:    #F0F4FA;
+  --border:      #DDE4EF;
+  --border2:     #C8D3E8;
+
+  /* Platform brand colors — keep original */
+  --meta:        #1877F2;
+  --meta-bg:     #EBF3FE;
+  --google:      #34A853;
+  --google-bg:   #EAF7EE;
+  --tiktok:      #EE1D52;
+  --tiktok-bg:   #FEECF0;
+  --yandex:      #CC3333;
+  --yandex-bg:   #FEF0F0;
+  --custom:      #7C5FE0;
+  --custom-bg:   #F3F0FE;
+
+  --text:        #0F1D38;      /* near-black */
+  --text2:       #4A5A7A;      /* secondary */
+  --text3:       #8A97B0;      /* muted */
+
+  --success:     #22A05A;
+  --warning:     #E07A00;
+  --danger:      #D63B3B;
+
+  --font-head:   'Montserrat', sans-serif;
+  --font-body:   'Inter', sans-serif;
+
+  --radius:      10px;
+  --radius-sm:   7px;
+  --transition:  0.18s ease;
+
+  --shadow-sm:   0 1px 4px rgba(15,29,56,0.08);
+  --shadow-md:   0 4px 16px rgba(15,29,56,0.10);
+  --shadow-lg:   0 8px 32px rgba(15,29,56,0.13);
+}
+
+html { font-size: 15px; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* ─── LAYOUT ─── */
+.app-shell {
+  position: relative;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 24px 100px;
+}
+
+/* ─── HEADER ─── */
+.app-header {
+  padding: 0;
+  margin-bottom: 28px;
+  border-bottom: none;
+}
+
+.header-top-bar {
+  background: var(--blue);
+  margin: 0 -24px;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.header-logo {
+  font-family: var(--font-head);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.header-logo span {
+  opacity: 0.55;
+  font-weight: 500;
+  font-size: 0.8rem;
+  margin-left: 10px;
+  letter-spacing: 0.03em;
+  text-transform: none;
+}
+.header-badge {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.85);
+  font-size: 0.7rem;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-family: var(--font-head);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.header-main {
+  background: var(--white);
+  margin: 0 -24px;
+  padding: 24px 24px 20px;
+  border-bottom: 3px solid var(--blue);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 24px;
+}
+.header-left h1 {
+  font-family: var(--font-head);
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+.header-left h1 span { color: var(--blue); }
+.header-left p {
+  color: var(--text3);
+  font-size: 0.8rem;
+  margin-top: 4px;
+  letter-spacing: 0.03em;
+}
+
+/* ─── SECTIONS ─── */
+.section {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 14px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.section-header {
+  padding: 14px 20px;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--transition);
+}
+.section-header:hover { background: var(--blue-xlight); }
+.section.collapsed .section-header { border-bottom-color: transparent; }
+.section-icon {
+  width: 28px; height: 28px;
+  border-radius: 7px;
+  display: grid; place-items: center;
+  font-size: 0.88rem;
+  flex-shrink: 0;
+}
+.section-title {
+  font-family: var(--font-head);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  text-transform: uppercase;
+}
+.section-toggle {
+  margin-left: auto;
+  color: var(--text3);
+  transition: transform var(--transition);
+  font-size: 0.72rem;
+}
+.section.collapsed .section-toggle { transform: rotate(-90deg); }
+.section.collapsed .section-body { display: none; }
+.section-body { padding: 20px; }
+
+/* ─── GRID LAYOUTS ─── */
+.form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+.form-grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
+.span-2 { grid-column: span 2; }
+.span-full { grid-column: 1 / -1; }
+
+/* ─── FORM FIELDS ─── */
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text2);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.field label .req { color: var(--blue); margin-left: 2px; }
+
+input, select, textarea {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  padding: 9px 13px;
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  width: 100%;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px var(--blue-glow);
+}
+input::placeholder, textarea::placeholder { color: var(--text3); }
+select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234A5A7A' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; -webkit-appearance: none; appearance: none; padding-right: 32px; }
+select option { background: #fff; color: var(--text); }
+textarea { resize: vertical; min-height: 80px; }
+
+input[type="number"] { -moz-appearance: textfield; }
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+/* ─── PLATFORMS GRID ─── */
+.platforms-grid { display: flex; flex-direction: column; gap: 10px; }
+
+.platform-card {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+.platform-card:hover { border-color: var(--border2); box-shadow: var(--shadow-md); }
+
+.platform-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 16px;
+  background: var(--white);
+  cursor: pointer;
+  user-select: none;
+}
+.platform-dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.platform-name {
+  font-family: var(--font-head);
+  font-size: 0.76rem;
+  font-weight: 700;
+  flex: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.platform-budget-preview {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--blue);
+  font-variant-numeric: tabular-nums;
+}
+.platform-actions { display: flex; gap: 5px; align-items: center; }
+
+.btn-icon {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text3);
+  width: 26px; height: 26px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: grid; place-items: center;
+  font-size: 0.8rem;
+  transition: all var(--transition);
+}
+.btn-icon:hover { background: var(--blue-light); border-color: var(--blue); color: var(--blue); }
+.btn-icon.danger:hover { border-color: var(--danger); color: var(--danger); background: #FEF0F0; }
+
+.platform-fields {
+  padding: 14px 16px;
+  border-top: 1px solid var(--border);
+  display: none;
+}
+.platform-card.open .platform-fields { display: block; }
+
+/* ─── CAMPAIGNS ─── */
+.campaigns-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+.campaign-row {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+}
+.campaign-row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.campaign-num {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--blue);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ─── SMART FIELDS ─── */
+.field-pair { display: contents; }
+
+input.computed {
+  background: var(--blue-light);
+  border-color: rgba(26,107,250,0.3);
+  color: var(--blue-dark);
+  font-weight: 600;
+}
+input.computed:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px var(--blue-glow);
+}
+input.manual-override {
+  border-color: rgba(224,122,0,0.45);
+  background: rgba(224,122,0,0.05);
+}
+
+.label-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 5px;
+}
+.label-row label { margin-bottom: 0 !important; }
+
+.calc-badge {
+  font-size: 0.58rem;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.7;
+}
+.calc-badge.auto {
+  background: var(--blue-light);
+  color: var(--blue);
+}
+.calc-badge.manual {
+  background: rgba(224,122,0,0.12);
+  color: var(--warning);
+}
+
+/* Daily budget row */
+.daily-budget-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--blue-xlight);
+  border: 1px solid rgba(26,107,250,0.2);
+  border-radius: var(--radius-sm);
+  margin-top: 8px;
+  font-size: 0.8rem;
+}
+.daily-budget-label { color: var(--text3); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+.daily-budget-value {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--blue);
+}
+.daily-budget-kzt { color: var(--text3); font-size: 0.76rem; }
+
+/* Field divider */
+.fields-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 12px 0;
+  position: relative;
+}
+.fields-divider span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+  background: var(--bg);
+  padding: 0 10px;
+  font-size: 0.63rem;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ─── ADD BUTTONS ─── */
+.btn-add {
+  background: transparent;
+  border: 1.5px dashed var(--border2);
+  color: var(--text3);
+  border-radius: var(--radius-sm);
+  padding: 9px 16px;
+  font-family: var(--font-body);
+  font-size: 0.83rem;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.btn-add:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+  background: var(--blue-xlight);
+}
+
+/* ─── RATE DISPLAY ─── */
+.rate-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 9px 13px;
+}
+.rate-value {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--blue);
+}
+.rate-label { color: var(--text3); font-size: 0.82rem; }
+
+/* ─── SUMMARY BAR ─── */
+.summary-bar {
+  position: sticky;
+  bottom: 16px;
+  z-index: 100;
+  background: var(--blue);
+  border-radius: 14px;
+  padding: 14px 22px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 8px 32px rgba(26,107,250,0.35), 0 2px 8px rgba(26,107,250,0.2);
+  margin-top: 28px;
+}
+.summary-item { display: flex; flex-direction: column; gap: 1px; }
+.summary-label {
+  font-size: 0.63rem;
+  color: rgba(255,255,255,0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 700;
+}
+.summary-value {
+  font-family: var(--font-head);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+.summary-value.accent { color: #A8CBFF; }
+.summary-divider {
+  width: 1px;
+  height: 28px;
+  background: rgba(255,255,255,0.2);
+}
+.summary-actions { margin-left: auto; display: flex; gap: 8px; }
+
+/* ─── EXPORT BUTTONS ─── */
+.btn-export {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-head);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+.btn-export.excel {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+.btn-export.excel:hover {
+  background: rgba(255,255,255,0.25);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+}
+.btn-export.pdf {
+  background: #fff;
+  color: var(--blue);
+}
+.btn-export.pdf:hover {
+  background: var(--blue-light);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+}
+.btn-export:active { transform: translateY(0); }
+
+/* ─── TOAST ─── */
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: var(--shadow-lg);
+  transform: translateX(120%);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  font-size: 0.86rem;
+  max-width: 320px;
+  color: var(--text);
+}
+.toast.show { transform: translateX(0); }
+.toast.success { border-color: var(--success); }
+.toast.error { border-color: var(--danger); }
+
+/* ─── PLATFORM ADD PANEL ─── */
+.add-platform-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+.platform-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 11px 8px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text2);
+  text-align: center;
+  background: var(--white);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.platform-chip:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+  background: var(--blue-xlight);
+  box-shadow: var(--shadow-sm);
+}
+.platform-chip .chip-icon { font-size: 1.3rem; }
+.platform-chip.added { opacity: 0.35; pointer-events: none; }
+
+/* ─── SEMANTIC ─── */
+.keywords-wrap textarea {
+  min-height: 120px;
+  font-family: monospace;
+  font-size: 0.82rem;
+  line-height: 1.7;
+}
+.keywords-hint { font-size: 0.73rem; color: var(--text3); margin-top: 4px; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 680px) {
+  .form-grid-2, .form-grid-3, .form-grid-4 { grid-template-columns: 1fr; }
+  .span-2 { grid-column: span 1; }
+  .summary-bar { flex-wrap: wrap; }
+  .add-platform-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ─── SPINNER ─── */
+.spinner {
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: none;
+}
+.btn-export.pdf .spinner { border-top-color: var(--blue); border-color: rgba(26,107,250,0.3); }
+.btn-export.loading .spinner { display: block; }
+.btn-export.loading .btn-label { display: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── MISC ─── */
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--blue-mid); }
+
+/* ─── LOCK BUTTONS ─── */
+.lock-btn {
+  background: var(--white);
+  border: 1px solid var(--border);
+  color: var(--text3);
+  border-radius: 5px;
+  padding: 4px 10px;
+  font-size: 0.68rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+.lock-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-xlight); }
+.lock-btn.active {
+  background: var(--blue-light);
+  border-color: var(--blue);
+  color: var(--blue);
+  font-weight: 700;
+}
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="header-top-bar">
+      <div class="header-logo">DISKURS <span>Performance Department</span></div>
+      <div class="header-badge">Медиаплан v2.0</div>
+    </div>
+    <div class="header-main">
+      <div class="header-left">
+        <h1>Генератор <span>медиаплана</span></h1>
+        <p>Заполните форму и скачайте готовый документ для клиента — Excel или PDF</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- SECTION: Клиент -->
+  <div class="section" id="sec-client">
+    <div class="section-header" onclick="toggleSection('sec-client')">
+      <div class="section-icon" style="background:var(--blue-light)">👤</div>
+      <span class="section-title">Клиент и кампания</span>
+      <span class="section-toggle">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="form-grid-2">
+        <div class="field">
+          <label>Клиент <span class="req">*</span></label>
+          <input type="text" id="client" placeholder="Название компании" oninput="updateSummary()">
+        </div>
+        <div class="field">
+          <label>Бренд</label>
+          <input type="text" id="brand" placeholder="Название бренда (если отличается)">
+        </div>
+        <div class="field">
+          <label>Партнёр / агентство</label>
+          <input type="text" id="agency" value="DISKURS">
+        </div>
+        <div class="field">
+          <label>Регион показа <span class="req">*</span></label>
+          <input type="text" id="region" placeholder="Алматы" value="Алматы">
+        </div>
+        <div class="field span-2">
+          <label>Вид услуги</label>
+          <input type="text" id="service" placeholder="Таргетированная реклама, контекстная реклама, TikTok">
+        </div>
+        <div class="field">
+          <label>Сайт</label>
+          <input type="url" id="website" placeholder="https://example.com">
+        </div>
+        <div class="field">
+          <label>Instagram</label>
+          <input type="url" id="instagram" placeholder="https://instagram.com/...">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: Период и курс -->
+  <div class="section" id="sec-period">
+    <div class="section-header" onclick="toggleSection('sec-period')">
+      <div class="section-icon" style="background:rgba(224,122,0,0.1)">📅</div>
+      <span class="section-title">Период и бюджет</span>
+      <span class="section-toggle">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="form-grid-4">
+        <div class="field">
+          <label>Начало кампании <span class="req">*</span></label>
+          <input type="date" id="date-start" oninput="updateSummary()">
+        </div>
+        <div class="field">
+          <label>Окончание кампании <span class="req">*</span></label>
+          <input type="date" id="date-end" oninput="updateSummary()">
+        </div>
+        <div class="field">
+          <label>Длительность</label>
+          <div class="rate-display" style="min-height:42px">
+            <span class="rate-value" id="duration-display">—</span>
+            <span class="rate-label">дней</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Курс USD/KZT <span class="req">*</span></label>
+          <input type="number" id="usd-rate" value="463.20" step="0.01" min="1" oninput="updateSummary()">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: Платформы -->
+  <div class="section" id="sec-platforms">
+    <div class="section-header" onclick="toggleSection('sec-platforms')">
+      <div class="section-icon" style="background:var(--blue-light)">📡</div>
+      <span class="section-title">Платформы и кампании</span>
+      <span class="section-toggle">▼</span>
+    </div>
+    <div class="section-body">
+
+      <div class="platforms-grid" id="platforms-grid">
+        <!-- Platform cards inserted here -->
+      </div>
+
+      <div class="divider"></div>
+
+      <div style="margin-bottom:10px;font-size:0.7rem;color:var(--text3);font-weight:700;letter-spacing:0.06em;text-transform:uppercase;">Добавить платформу</div>
+      <div class="add-platform-grid" id="platform-chips">
+        <!-- chips inserted by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: Семантика -->
+  <div class="section collapsed" id="sec-semantic">
+    <div class="section-header" onclick="toggleSection('sec-semantic')">
+      <div class="section-icon" style="background:var(--google-bg)">🔑</div>
+      <span class="section-title">Семантическое ядро (Google)</span>
+      <span class="section-toggle">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="form-grid-2">
+        <div class="field span-full keywords-wrap">
+          <label>Ключевые слова</label>
+          <textarea id="keywords" placeholder="Каждое ключевое слово с новой строки:&#10;иппп алматы&#10;анализы на иппп&#10;сдать анализы на иппп&#10;..."></textarea>
+          <div class="keywords-hint">Каждое ключевое слово — с новой строки. Для минус-слов добавьте «-» в начале: <code>-бесплатно</code></div>
+        </div>
+        <div class="field">
+          <label>Тип соответствия по умолчанию</label>
+          <select id="match-type">
+            <option value="Фразовое">Фразовое</option>
+            <option value="Точное">Точное</option>
+            <option value="Широкое">Широкое</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Комментарий к ядру</label>
+          <input type="text" id="sem-comment" placeholder="Например: собрано через Wordstat, июнь 2026">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: Комментарий -->
+  <div class="section collapsed" id="sec-notes">
+    <div class="section-header" onclick="toggleSection('sec-notes')">
+      <div class="section-icon" style="background:var(--blue-light)">📝</div>
+      <span class="section-title">Примечания и дисклеймер</span>
+      <span class="section-toggle">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="field">
+        <label>Примечание для клиента</label>
+        <textarea id="notes" placeholder="Прогнозные показатели носят ориентировочный характер...">Прогнозные показатели (CTR, CR, конверсии) носят ориентировочный характер и основаны на средних бенчмарках по нише. Фактические результаты зависят от качества посадочных страниц, сезонности и конкурентной среды. Курс USD/KZT актуален на дату составления медиаплана.</textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- STICKY SUMMARY BAR -->
+  <div class="summary-bar">
+    <div class="summary-item">
+      <span class="summary-label">Бюджет $</span>
+      <span class="summary-value accent" id="sum-usd">0</span>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-item">
+      <span class="summary-label">Бюджет ₸</span>
+      <span class="summary-value" id="sum-kzt">0</span>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-item">
+      <span class="summary-label">Показов</span>
+      <span class="summary-value" id="sum-imp">0</span>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-item">
+      <span class="summary-label">Конверсий</span>
+      <span class="summary-value" id="sum-conv">0</span>
+    </div>
+    <div class="summary-actions">
+      <button class="btn-export excel" onclick="exportExcel(this)">
+        <span class="btn-label">⬇ Excel</span>
+        <div class="spinner"></div>
+      </button>
+      <button class="btn-export pdf" onclick="exportPDF(this)">
+        <span class="btn-label">⬇ PDF</span>
+        <div class="spinner"></div>
+      </button>
+    </div>
+  </div>
+
+</div><!-- /app-shell -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- HIDDEN PRINT AREA for PDF -->
+<div id="pdf-render" style="position:fixed;left:-9999px;top:0;width:1100px;background:#fff;font-family:'Golos Text',sans-serif;z-index:-1;"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA MODEL
+// ═══════════════════════════════════════════════════════════════
+const PLATFORMS = [
+  { id: 'meta',    name: 'Meta (Facebook / Instagram)', color: '#1877F2', bg: 'rgba(24,119,242,0.12)', icon: '📘',
+    defaultUnit: '1 000 показов', defaultType: 'Конверсии с сайта' },
+  { id: 'google',  name: 'Google Ads',                  color: '#34A853', bg: 'rgba(52,168,83,0.12)',   icon: '🔍',
+    defaultUnit: '1 клик',        defaultType: 'Поисковые кампании' },
+  { id: 'tiktok',  name: 'TikTok Ads',                  color: '#EE1D52', bg: 'rgba(238,29,82,0.12)',   icon: '🎵',
+    defaultUnit: '1 000 показов', defaultType: 'Конверсии с сайта' },
+  { id: 'yandex',  name: 'Яндекс.Директ',               color: '#FFCC00', bg: 'rgba(255,204,0,0.10)',   icon: '🟡',
+    defaultUnit: '1 клик',        defaultType: 'Поисковые кампании' },
+  { id: 'custom',  name: 'Другая платформа',             color: '#A78BFA', bg: 'rgba(167,139,250,0.12)', icon: '🛠',
+    defaultUnit: '1 000 показов', defaultType: 'Кампания' },
+];
+
+const CAMPAIGN_TYPES = [
+  'Конверсии с сайта','Трафик на сайт','Трафик на магазин Kaspi',
+  'Лиды (Lead Ads)','Охват и узнаваемость','Просмотры видео',
+  'Поисковые кампании','Торговые кампании','Ретаргетинг','Другое',
+];
+const UNITS = ['1 000 показов','1 клик','1 день','1 000 просмотров'];
+const LANGS = ['Русский','Казахский','English','Русский + Казахский'];
+
+let addedPlatforms = []; // [{platformId, campaigns:[{...}]}]
+let platformCounter = 0;
+let campaignCounter = 0;
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  // Set today as default start, +30d as end
+  const today = new Date();
+  const end = new Date(today); end.setDate(end.getDate() + 29);
+  document.getElementById('date-start').value = fmtDateInput(today);
+  document.getElementById('date-end').value = fmtDateInput(end);
+
+  renderPlatformChips();
+
+  // Add Meta and Google by default
+  addPlatform('meta');
+  addPlatform('google');
+
+  updateSummary();
+});
+
+function fmtDateInput(d) {
+  return d.toISOString().split('T')[0];
+}
+function fmtDateDisplay(str) {
+  if (!str) return '—';
+  const [y,m,d] = str.split('-');
+  return `${d}.${m}.${y}`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SECTION TOGGLE
+// ═══════════════════════════════════════════════════════════════
+function toggleSection(id) {
+  document.getElementById(id).classList.toggle('collapsed');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PLATFORM CHIPS
+// ═══════════════════════════════════════════════════════════════
+function renderPlatformChips() {
+  const container = document.getElementById('platform-chips');
+  container.innerHTML = PLATFORMS.map(p => `
+    <div class="platform-chip ${addedPlatforms.find(ap=>ap.platformId===p.id)?'added':''}"
+         id="chip-${p.id}" onclick="addPlatform('${p.id}')">
+      <span class="chip-icon">${p.icon}</span>
+      <span>${p.name.split(' ')[0]}</span>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ADD PLATFORM
+// ═══════════════════════════════════════════════════════════════
+function addPlatform(platformId) {
+  if (addedPlatforms.find(ap => ap.platformId === platformId)) {
+    showToast('Платформа уже добавлена', 'error'); return;
+  }
+  const pDef = PLATFORMS.find(p => p.id === platformId);
+  const pid = ++platformCounter;
+  const firstCampaign = makeCampaign(pDef);
+  addedPlatforms.push({ platformId, pid, campaigns: [firstCampaign] });
+  renderPlatforms();
+  renderPlatformChips();
+  updateSummary();
+}
+
+function makeCampaign(pDef) {
+  return {
+    cid: ++campaignCounter,
+    type: pDef.defaultType,
+    audience: 'Алматы',
+    lang: 'Русский',
+    unit: pDef.defaultUnit,
+    // Budget block
+    rate: '',
+    qty: '',
+    budget: '',
+    budgetLock: 'rate_qty',   // 'rate_qty' | 'rate_budget' | 'qty_budget'
+    // Impressions
+    imp: '',
+    impManual: false,
+    // Clicks
+    ctr: '',
+    clicks: '',
+    clicksManual: false,
+    // Conversions
+    cr: '',
+    conversions: '',
+    convLock: 'cr_auto',      // 'cr_auto' | 'conv_manual'
+  };
+}
+
+function removePlatform(pid) {
+  addedPlatforms = addedPlatforms.filter(ap => ap.pid !== pid);
+  renderPlatforms();
+  renderPlatformChips();
+  updateSummary();
+}
+
+function addCampaign(pid) {
+  const ap = addedPlatforms.find(p => p.pid === pid);
+  const pDef = PLATFORMS.find(p => p.id === ap.platformId);
+  ap.campaigns.push(makeCampaign(pDef));
+  renderPlatforms();
+  updateSummary();
+}
+
+function removeCampaign(pid, cid) {
+  const ap = addedPlatforms.find(p => p.pid === pid);
+  if (ap.campaigns.length === 1) { showToast('Нельзя удалить единственную кампанию', 'error'); return; }
+  ap.campaigns = ap.campaigns.filter(c => c.cid !== cid);
+  renderPlatforms();
+  updateSummary();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER PLATFORMS
+// ═══════════════════════════════════════════════════════════════
+function renderPlatforms() {
+  const grid = document.getElementById('platforms-grid');
+  grid.innerHTML = addedPlatforms.map(ap => {
+    const pDef = PLATFORMS.find(p => p.id === ap.platformId);
+    const totalBudget = ap.campaigns.reduce((s, c) => s + (getEffectiveBudget(c)), 0);
+    const budgetStr = totalBudget > 0 ? `$${fmt(totalBudget)}` : '';
+
+    return `
+    <div class="platform-card open" id="pcard-${ap.pid}">
+      <div class="platform-header">
+        <div class="platform-dot" style="background:${pDef.color}"></div>
+        <span class="platform-name" style="color:${pDef.color}">${pDef.icon} ${pDef.name}</span>
+        <span class="platform-budget-preview">${budgetStr}</span>
+        <div class="platform-actions">
+          <button class="btn-icon" onclick="togglePlatformCard(${ap.pid})" title="Свернуть">▲</button>
+          <button class="btn-icon danger" onclick="removePlatform(${ap.pid})" title="Удалить">✕</button>
+        </div>
+      </div>
+      <div class="platform-fields" style="background:${pDef.bg}">
+        <div class="campaigns-list">
+          ${ap.campaigns.map((c, idx) => renderCampaignRow(ap.pid, c, idx + 1, pDef)).join('')}
+        </div>
+        <button class="btn-add" onclick="addCampaign(${ap.pid})">+ Добавить кампанию</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function togglePlatformCard(pid) {
+  const card = document.getElementById(`pcard-${pid}`);
+  card.classList.toggle('open');
+  const btn = card.querySelector('.platform-header .btn-icon:first-child');
+  btn.textContent = card.classList.contains('open') ? '▲' : '▼';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SMART CALCULATIONS
+// ═══════════════════════════════════════════════════════════════
+
+// Is this a CPM/CPV unit (cost per 1000)?
+function isCpmUnit(unit) {
+  return unit === '1 000 показов' || unit === '1 000 просмотров';
+}
+
+// Derive the three budget fields from whichever two are known
+function recalcBudget(c) {
+  const r = parseFloat(c.rate);
+  const q = parseFloat(c.qty);
+  const b = parseFloat(c.budget);
+
+  if (c.budgetLock === 'rate_qty') {
+    // User sets rate + qty → budget computed
+    if (!isNaN(r) && !isNaN(q)) c.budget = String(+(r * q).toFixed(2));
+    else c.budget = '';
+  } else if (c.budgetLock === 'rate_budget') {
+    // User sets rate + budget → qty computed
+    if (!isNaN(r) && r > 0 && !isNaN(b)) c.qty = String(+(b / r).toFixed(2));
+    else c.qty = '';
+  } else if (c.budgetLock === 'qty_budget') {
+    // User sets qty + budget → rate computed
+    if (!isNaN(q) && q > 0 && !isNaN(b)) c.rate = String(+(b / q).toFixed(4));
+    else c.rate = '';
+  }
+}
+
+// Auto-derive impressions from qty when unit is CPM
+function recalcImp(c) {
+  if (c.impManual) return;
+  if (isCpmUnit(c.unit)) {
+    // CPM/CPV: показы = кол-во × 1000
+    const q = parseFloat(c.qty);
+    c.imp = (!isNaN(q) && q > 0) ? String(Math.round(q * 1000)) : '';
+  } else if (c.unit === '1 клик') {
+    // CPC: показы = клики / CTR × 100 (если CTR известен)
+    const clicks = parseFloat(c.clicks) || (parseFloat(c.qty) || 0);
+    const ctr = parseFloat(c.ctr);
+    if (clicks > 0 && !isNaN(ctr) && ctr > 0) {
+      c.imp = String(Math.round(clicks / ctr * 100));
+    } else {
+      c.imp = '';
+    }
+  }
+}
+
+// Auto-derive clicks from imp * CTR  (or qty for CPC)
+function recalcClicks(c) {
+  if (c.clicksManual) return;
+  if (c.unit === '1 клик') {
+    // CPC: клики = кол-во единиц
+    const q = parseFloat(c.qty);
+    c.clicks = (!isNaN(q) && q > 0) ? String(Math.round(q)) : '';
+  } else {
+    // CPM/CPV: клики = показы × CTR / 100
+    const imp = parseFloat(c.imp);
+    const ctr = parseFloat(c.ctr);
+    if (!isNaN(imp) && imp > 0 && !isNaN(ctr) && ctr > 0) {
+      c.clicks = String(Math.round(imp * ctr / 100));
+    } else {
+      c.clicks = '';
+    }
+  }
+}
+
+// Auto-derive conversions from clicks * CR, or CR from conv/clicks
+function recalcConv(c) {
+  const clicks = parseFloat(c.clicks);
+  const cr = parseFloat(c.cr);
+  const conv = parseFloat(c.conversions);
+
+  if (c.convLock === 'cr_auto') {
+    // CR → conversions
+    if (!isNaN(clicks) && !isNaN(cr) && clicks > 0) {
+      c.conversions = String(Math.round(clicks * cr / 100));
+    } else {
+      c.conversions = '';
+    }
+  } else {
+    // conversions → CR
+    if (!isNaN(conv) && !isNaN(clicks) && clicks > 0) {
+      c.cr = String(+(conv / clicks * 100).toFixed(2));
+    }
+  }
+}
+
+// Run full recalc chain for a campaign
+function recalcAll(c) {
+  recalcBudget(c);
+  if (c.unit === '1 клик') {
+    recalcClicks(c); // сначала клики из qty
+    recalcImp(c);    // потом показы из кликов + CTR
+  } else {
+    recalcImp(c);    // сначала показы из qty
+    recalcClicks(c); // потом клики из показов + CTR
+  }
+  recalcConv(c);
+}
+
+function getEffectiveBudget(c) {
+  const b = parseFloat(c.budget);
+  if (!isNaN(b)) return b;
+  const r = parseFloat(c.rate), q = parseFloat(c.qty);
+  if (!isNaN(r) && !isNaN(q)) return r * q;
+  return 0;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER CAMPAIGN ROW (no re-render on input — DOM patching)
+// ═══════════════════════════════════════════════════════════════
+function renderCampaignRow(pid, c, num, pDef) {
+  recalcAll(c); // ensure derived fields are current before render
+
+  const dur = getDuration();
+  const budget = getEffectiveBudget(c);
+  const dailyBudget = dur > 0 && budget > 0 ? budget / dur : 0;
+  const rate = parseFloat(document.getElementById('usd-rate')?.value) || 463.2;
+  const dailyKzt = Math.round(dailyBudget * rate);
+
+  const typeOpts = CAMPAIGN_TYPES.map(t =>
+    `<option value="${t}" ${c.type===t?'selected':''}>${t}</option>`).join('');
+  const unitOpts = UNITS.map(u =>
+    `<option value="${u}" ${c.unit===u?'selected':''}>${u}</option>`).join('');
+  const langOpts = LANGS.map(l =>
+    `<option value="${l}" ${c.lang===l?'selected':''}>${l}</option>`).join('');
+
+  // Budget lock toggle labels
+  const lockLabels = {
+    'rate_qty':     'ставка × кол-во → бюджет',
+    'rate_budget':  'ставка × бюджет → кол-во',
+    'qty_budget':   'кол-во × бюджет → ставка',
+  };
+
+  // Figure out which budget fields are computed vs manual
+  const budgetComputed = c.budgetLock === 'rate_qty';
+  const qtyComputed    = c.budgetLock === 'rate_budget';
+  const rateComputed   = c.budgetLock === 'qty_budget';
+
+  const impAuto   = !c.impManual && (isCpmUnit(c.unit) || c.unit === '1 клик');
+  const clicksAuto = !c.clicksManual;
+  const convAuto  = c.convLock === 'cr_auto';
+
+  return `
+  <div class="campaign-row" id="crow-${c.cid}">
+    <div class="campaign-row-header">
+      <span class="campaign-num">Кампания ${num}</span>
+      <button class="btn-icon danger" onclick="removeCampaign(${pid},${c.cid})" title="Удалить">✕</button>
+    </div>
+
+    <!-- Row 1: Meta -->
+    <div class="form-grid-4">
+      <div class="field span-2">
+        <label>Тип кампании</label>
+        <select onchange="onCampaignChange(${pid},${c.cid},'type',this.value)">${typeOpts}</select>
+      </div>
+      <div class="field">
+        <label>Аудитория / ГЕО</label>
+        <input type="text" value="${c.audience}" onchange="onCampaignChange(${pid},${c.cid},'audience',this.value)" placeholder="Алматы, 25–45">
+      </div>
+      <div class="field">
+        <label>Язык</label>
+        <select onchange="onCampaignChange(${pid},${c.cid},'lang',this.value)">${langOpts}</select>
+      </div>
+    </div>
+
+    <div class="fields-divider"><span>Бюджет</span></div>
+
+    <!-- Budget lock selector -->
+    <div style="margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span style="font-size:0.68rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;font-weight:700">Режим:</span>
+      ${Object.entries(lockLabels).map(([key, label]) => `
+        <button class="lock-btn ${c.budgetLock===key?'active':''}"
+          onclick="setBudgetLock(${pid},${c.cid},'${key}')">${label}</button>
+      `).join('')}
+    </div>
+
+    <!-- Row 2: Budget fields -->
+    <div class="form-grid-4">
+      <div class="field">
+        <div class="label-row">
+          <label>Формат закупки</label>
+        </div>
+        <select onchange="onCampaignChange(${pid},${c.cid},'unit',this.value)">${unitOpts}</select>
+      </div>
+      <div class="field">
+        <div class="label-row">
+          <label>Ставка, $</label>
+          ${rateComputed ? '<span class="calc-badge auto">авто</span>' : ''}
+        </div>
+        <input type="number" id="f-rate-${c.cid}"
+          value="${c.rate}" step="0.01" min="0" placeholder="0.00"
+          class="${rateComputed ? 'computed' : ''}"
+          ${rateComputed ? 'readonly' : ''}
+          oninput="onCampaignChange(${pid},${c.cid},'rate',this.value)">
+      </div>
+      <div class="field">
+        <div class="label-row">
+          <label>Кол-во единиц</label>
+          ${qtyComputed ? '<span class="calc-badge auto">авто</span>' : ''}
+        </div>
+        <input type="number" id="f-qty-${c.cid}"
+          value="${c.qty}" step="1" min="0" placeholder="0"
+          class="${qtyComputed ? 'computed' : ''}"
+          ${qtyComputed ? 'readonly' : ''}
+          oninput="onCampaignChange(${pid},${c.cid},'qty',this.value)">
+      </div>
+      <div class="field">
+        <div class="label-row">
+          <label>Бюджет, $</label>
+          ${budgetComputed ? '<span class="calc-badge auto">авто</span>' : ''}
+        </div>
+        <input type="number" id="f-budget-${c.cid}"
+          value="${c.budget}" step="0.01" min="0" placeholder="0.00"
+          class="${budgetComputed ? 'computed' : ''}"
+          ${budgetComputed ? 'readonly' : ''}
+          oninput="onCampaignChange(${pid},${c.cid},'budget',this.value)">
+      </div>
+    </div>
+
+    <!-- Daily budget line -->
+    <div class="daily-budget-row" id="daily-${c.cid}">
+      <span class="daily-budget-label">Дневной бюджет:</span>
+      <span class="daily-budget-value">${dailyBudget > 0 ? '$' + fmt(dailyBudget) : '—'}</span>
+      ${dailyKzt > 0 ? `<span class="daily-budget-kzt">≈ ${fmt(dailyKzt)} ₸</span>` : ''}
+      <span style="margin-left:auto;font-size:0.72rem;color:var(--text3)">${dur > 0 ? `на ${dur} дн.` : 'укажите период'}</span>
+    </div>
+
+    <div class="fields-divider"><span>Прогнозы</span></div>
+
+    <!-- Row 3: Forecast -->
+    <div class="form-grid-4">
+      <div class="field">
+        <div class="label-row">
+          <label>Показы</label>
+          ${impAuto ? '<span class="calc-badge auto">авто</span>' : '<span class="calc-badge manual">ручной</span>'}
+        </div>
+        <input type="number" id="f-imp-${c.cid}"
+          value="${c.imp}" step="1000" min="0" placeholder="0"
+          class="${impAuto ? 'computed' : 'manual-override'}"
+          oninput="onImpInput(${pid},${c.cid},this.value)"
+          ondblclick="resetImpAuto(${pid},${c.cid})"
+          title="${impAuto ? '' : 'Двойной клик — сбросить на авто'}">
+      </div>
+      <div class="field">
+        <div class="label-row">
+          <label>CTR, %</label>
+        </div>
+        <input type="number" id="f-ctr-${c.cid}"
+          value="${c.ctr}" step="0.1" min="0" max="100" placeholder="0.0"
+          oninput="onCampaignChange(${pid},${c.cid},'ctr',this.value)">
+      </div>
+      <div class="field">
+        <div class="label-row">
+          <label>Клики</label>
+          ${clicksAuto ? '<span class="calc-badge auto">авто</span>' : '<span class="calc-badge manual">ручной</span>'}
+        </div>
+        <input type="number" id="f-clicks-${c.cid}"
+          value="${c.clicks}" step="10" min="0" placeholder="0"
+          class="${clicksAuto ? 'computed' : 'manual-override'}"
+          oninput="onClicksInput(${pid},${c.cid},this.value)"
+          ondblclick="resetClicksAuto(${pid},${c.cid})"
+          title="${clicksAuto ? '' : 'Двойной клик — сбросить на авто'}">
+      </div>
+      <div class="field">
+        <div class="label-row">
+          <label>CPC, $</label>
+          <span class="calc-badge auto">авто</span>
+        </div>
+        <input type="number" id="f-cpc-${c.cid}"
+          value="${calcCPC(c)}" readonly class="computed" placeholder="—">
+      </div>
+    </div>
+
+    <!-- Row 4: Conversions -->
+    <div class="form-grid-4" style="margin-top:10px">
+      <div class="field">
+        <div class="label-row">
+          <label>CR, %</label>
+          ${!convAuto ? '<span class="calc-badge auto">авто</span>' : ''}
+        </div>
+        <input type="number" id="f-cr-${c.cid}"
+          value="${c.cr}" step="0.1" min="0" max="100" placeholder="0.0"
+          class="${!convAuto ? 'computed' : ''}"
+          ${!convAuto ? 'readonly' : ''}
+          oninput="onCampaignChange(${pid},${c.cid},'cr',this.value)">
+      </div>
+      <div class="field">
+        <div class="label-row">
+          <label>Конверсии</label>
+          ${convAuto ? '<span class="calc-badge auto">авто</span>' : '<span class="calc-badge manual">ручной</span>'}
+        </div>
+        <input type="number" id="f-conv-${c.cid}"
+          value="${c.conversions}" step="1" min="0" placeholder="0"
+          class="${convAuto ? 'computed' : 'manual-override'}"
+          oninput="onConvInput(${pid},${c.cid},this.value)"
+          ondblclick="resetConvAuto(${pid},${c.cid})"
+          title="${convAuto ? '' : 'Двойной клик — сбросить на авто (CR → конверсии)'}">
+      </div>
+      <div class="field">
+        <div class="label-row">
+          <label>CPL, $</label>
+          <span class="calc-badge auto">авто</span>
+        </div>
+        <input type="number" id="f-cpl-${c.cid}"
+          value="${calcCPL(c)}" readonly class="computed" placeholder="—">
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─── Helpers ─────────────────────────────────────────────────
+function calcCPC(c) {
+  const budget = getEffectiveBudget(c);
+  const clicks = parseFloat(c.clicks);
+  if (budget > 0 && !isNaN(clicks) && clicks > 0)
+    return +(budget / clicks).toFixed(2);
+  return '';
+}
+function calcCPL(c) {
+  const budget = getEffectiveBudget(c);
+  const conv = parseFloat(c.conversions);
+  if (budget > 0 && !isNaN(conv) && conv > 0)
+    return +(budget / conv).toFixed(2);
+  return '';
+}
+
+// ─── DOM-patch helpers (no full re-render) ───────────────────
+function patchField(id, value, isAuto) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  // Only update if not focused (don't overwrite while user types)
+  if (document.activeElement !== el) {
+    el.value = value ?? '';
+    el.className = isAuto ? 'computed' : el.className.replace('computed','');
+    el.readOnly = !!isAuto;
+  }
+}
+
+function refreshCampaignCalcs(c) {
+  recalcAll(c);
+  const dur = getDuration();
+  const budget = getEffectiveBudget(c);
+  const rate = parseFloat(document.getElementById('usd-rate')?.value) || 463.2;
+  const dailyBudget = dur > 0 && budget > 0 ? budget / dur : 0;
+  const dailyKzt = Math.round(dailyBudget * rate);
+
+  // Patch computed fields
+  patchField(`f-rate-${c.cid}`,   c.rate,        c.budgetLock === 'qty_budget');
+  patchField(`f-qty-${c.cid}`,    c.qty,         c.budgetLock === 'rate_budget');
+  patchField(`f-budget-${c.cid}`, c.budget,      c.budgetLock === 'rate_qty');
+  patchField(`f-imp-${c.cid}`,    c.imp,         !c.impManual && (isCpmUnit(c.unit) || c.unit === '1 клик'));
+  patchField(`f-clicks-${c.cid}`, c.clicks,      !c.clicksManual);
+  patchField(`f-ctr-${c.cid}`,    c.ctr,         false);
+  patchField(`f-cr-${c.cid}`,     c.cr,          c.convLock !== 'cr_auto');
+  patchField(`f-conv-${c.cid}`,   c.conversions, c.convLock === 'cr_auto');
+  patchField(`f-cpc-${c.cid}`,    calcCPC(c),    true);
+  patchField(`f-cpl-${c.cid}`,    calcCPL(c),    true);
+
+  // Update daily budget row
+  const daily = document.getElementById(`daily-${c.cid}`);
+  if (daily) {
+    daily.innerHTML = `
+      <span class="daily-budget-label">Дневной бюджет:</span>
+      <span class="daily-budget-value">${dailyBudget > 0 ? '$' + fmt(dailyBudget) : '—'}</span>
+      ${dailyKzt > 0 ? `<span class="daily-budget-kzt">≈ ${fmt(dailyKzt)} ₸</span>` : ''}
+      <span style="margin-left:auto;font-size:0.72rem;color:var(--text3)">${dur > 0 ? `на ${dur} дн.` : 'укажите период'}</span>`;
+  }
+
+  // Update platform budget preview
+  const ap = addedPlatforms.find(p => p.campaigns.find(cc => cc.cid === c.cid));
+  if (ap) {
+    const totalBudget = ap.campaigns.reduce((s, cc) => s + getEffectiveBudget(cc), 0);
+    const previewEl = document.querySelector(`#pcard-${ap.pid} .platform-budget-preview`);
+    if (previewEl) previewEl.textContent = totalBudget > 0 ? `$${fmt(totalBudget)}` : '';
+  }
+}
+
+function getDuration() {
+  const ds = document.getElementById('date-start')?.value;
+  const de = document.getElementById('date-end')?.value;
+  if (!ds || !de) return 0;
+  const diff = Math.round((new Date(de) - new Date(ds)) / 86400000) + 1;
+  return diff > 0 ? diff : 0;
+}
+
+// ─── Event handlers ──────────────────────────────────────────
+function onCampaignChange(pid, cid, field, value) {
+  const ap = addedPlatforms.find(p => p.pid === pid);
+  const c = ap.campaigns.find(cc => cc.cid === cid);
+  c[field] = value;
+
+  // If unit changes and it's now CPM → reset impManual so auto kicks in
+  if (field === 'unit') {
+    c.impManual = false;
+    // Render full row because lock buttons need update
+    renderPlatforms(); updateSummary(); return;
+  }
+
+  refreshCampaignCalcs(c);
+  updateSummary();
+}
+
+// Set which two budget fields are "inputs"
+function setBudgetLock(pid, cid, lockMode) {
+  const ap = addedPlatforms.find(p => p.pid === pid);
+  const c = ap.campaigns.find(cc => cc.cid === cid);
+  c.budgetLock = lockMode;
+  // Re-render just this row to update readonly/computed states on buttons+inputs
+  renderPlatforms();
+  updateSummary();
+}
+
+// Impressions: user manually typed
+function onImpInput(pid, cid, value) {
+  const ap = addedPlatforms.find(p => p.pid === pid);
+  const c = ap.campaigns.find(cc => cc.cid === cid);
+  c.imp = value;
+  c.impManual = true;
+  refreshCampaignCalcs(c);
+  updateSummary();
+}
+function resetImpAuto(pid, cid) {
+  const ap = addedPlatforms.find(p => p.pid === pid);
+  const c = ap.campaigns.find(cc => cc.cid === cid);
+  c.impManual = false;
+  refreshCampaignCalcs(c);
+  updateSummary();
+}
+
+// Clicks: user manually typed
+function onClicksInput(pid, cid, value) {
+  const ap = addedPlatforms.find(p => p.pid === pid);
+  const c = ap.campaigns.find(cc => cc.cid === cid);
+  c.clicks = value;
+  c.clicksManual = true;
+  refreshCampaignCalcs(c);
+  updateSummary();
+}
+function resetClicksAuto(pid, cid) {
+  const ap = addedPlatforms.find(p => p.pid === pid);
+  const c = ap.campaigns.find(cc => cc.cid === cid);
+  c.clicksManual = false;
+  refreshCampaignCalcs(c);
+  updateSummary();
+}
+
+// Conversions: user manually typed → CR is derived
+function onConvInput(pid, cid, value) {
+  const ap = addedPlatforms.find(p => p.pid === pid);
+  const c = ap.campaigns.find(cc => cc.cid === cid);
+  c.conversions = value;
+  c.convLock = 'conv_manual';
+  refreshCampaignCalcs(c);
+  updateSummary();
+}
+function resetConvAuto(pid, cid) {
+  const ap = addedPlatforms.find(p => p.pid === pid);
+  const c = ap.campaigns.find(cc => cc.cid === cid);
+  c.convLock = 'cr_auto';
+  renderPlatforms(); // rebuild to update readonly state
+  updateSummary();
+}
+
+
+
+// ═══════════════════════════════════════════════════════════════
+// SUMMARY
+// ═══════════════════════════════════════════════════════════════
+function updateSummary() {
+  // Duration
+  const ds = document.getElementById('date-start').value;
+  const de = document.getElementById('date-end').value;
+  if (ds && de) {
+    const diff = Math.round((new Date(de) - new Date(ds)) / 86400000) + 1;
+    document.getElementById('duration-display').textContent = diff > 0 ? diff : '—';
+  }
+
+  const rate = parseFloat(document.getElementById('usd-rate').value) || 463.2;
+
+  let totalUSD = 0, totalImp = 0, totalConv = 0;
+  addedPlatforms.forEach(ap => {
+    ap.campaigns.forEach(c => {
+      totalUSD += getEffectiveBudget(c);
+      totalImp  += parseFloat(c.imp) || 0;
+      totalConv += parseFloat(c.conversions) || 0;
+      // Refresh daily budget display when period changes
+      refreshCampaignCalcs(c);
+    });
+  });
+
+  document.getElementById('sum-usd').textContent = '$' + fmt(totalUSD);
+  document.getElementById('sum-kzt').textContent = fmt(Math.round(totalUSD * rate)) + ' ₸';
+  document.getElementById('sum-imp').textContent = fmtBig(totalImp);
+  document.getElementById('sum-conv').textContent = fmt(totalConv);
+}
+
+function fmt(n) {
+  return Number(n).toLocaleString('ru-RU', {maximumFractionDigits: 2});
+}
+function fmtBig(n) {
+  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n/1000).toFixed(0) + 'K';
+  return String(n);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// COLLECT DATA
+// ═══════════════════════════════════════════════════════════════
+function collectData() {
+  const ds = document.getElementById('date-start').value;
+  const de = document.getElementById('date-end').value;
+  const rate = parseFloat(document.getElementById('usd-rate').value) || 463.2;
+  const dur = ds && de ? Math.round((new Date(de)-new Date(ds))/86400000)+1 : 0;
+
+  return {
+    client:    document.getElementById('client').value || '—',
+    brand:     document.getElementById('brand').value,
+    agency:    document.getElementById('agency').value || 'DISKURS',
+    region:    document.getElementById('region').value || 'Алматы',
+    service:   document.getElementById('service').value,
+    website:   document.getElementById('website').value,
+    instagram: document.getElementById('instagram').value,
+    dateStart: ds, dateEnd: de, duration: dur, rate,
+    keywords:  document.getElementById('keywords').value,
+    matchType: document.getElementById('match-type').value,
+    semComment: document.getElementById('sem-comment').value,
+    notes:     document.getElementById('notes').value,
+    platforms: addedPlatforms.map(ap => {
+      const pDef = PLATFORMS.find(p => p.id === ap.platformId);
+      return {
+        name: pDef.id === 'custom'
+          ? (ap.campaigns[0]?.customName || pDef.name)
+          : pDef.name,
+        color: pDef.color,
+        campaigns: ap.campaigns.map(c => {
+          recalcAll(c);
+          const budget = getEffectiveBudget(c);
+          const clicks = parseInt(c.clicks) || 0;
+          const conv   = parseInt(c.conversions) || 0;
+          return {
+            type: c.type,
+            audience: c.audience,
+            lang: c.lang,
+            unit: c.unit,
+            rate: parseFloat(c.rate) || 0,
+            qty: parseFloat(c.qty) || 0,
+            budget,
+            budgetKzt: Math.round(budget * rate),
+            dailyBudget: dur > 0 ? budget / dur : 0,
+            imp: parseInt(c.imp) || 0,
+            clicks,
+            ctr: parseFloat(c.ctr) || 0,
+            cr: parseFloat(c.cr) || 0,
+            conversions: conv,
+            cpc: clicks > 0 ? budget / clicks : 0,
+            cpl: conv > 0 ? budget / conv : 0,
+          };
+        })
+      };
+    })
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EXCEL EXPORT
+// ═══════════════════════════════════════════════════════════════
+async function exportExcel(btn) {
+  if (!validate()) return;
+  btn.classList.add('loading');
+  await sleep(50);
+  try {
+    const d = collectData();
+    const wb = XLSX.utils.book_new();
+
+    // ── Sheet 1: Медиаплан ──────────────────────────────────────
+    const rows = [];
+
+    // Title
+    rows.push([`МЕДИАПЛАН — ${d.client}`, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']);
+    rows.push([`Клиент: ${d.client}`, '', '', '', `Период: ${fmtDateDisplay(d.dateStart)} – ${fmtDateDisplay(d.dateEnd)}`, '', '', '', `Регион: ${d.region}`, '', '', '', `Курс USD/KZT: ${d.rate}`, '']);
+    rows.push([]); // spacer
+
+    // Header row
+    const hdr = ['№','Платформа','Тип кампании','Аудитория / ГЕО','Язык',
+      'Начало','Конец','Длит.','Формат закупки','Ставка, $','Кол-во единиц',
+      'Бюджет, $','Бюджет, ₸','Дн. бюджет, $',
+      'Прогноз показов','Прогноз кликов','CTR, %','CPC, $','CR, %','Конверсий','CPL, $'];
+    rows.push(hdr);
+
+    let rowNum = 1;
+    let totBudget=0, totBudgetKzt=0, totDaily=0, totImp=0, totClicks=0, totConv=0;
+
+    d.platforms.forEach(pl => {
+      // Platform group header
+      rows.push([`${pl.name}`, ...Array(20).fill('')]);
+
+      pl.campaigns.forEach(c => {
+        rows.push([
+          rowNum++, pl.name, c.type, c.audience, c.lang,
+          fmtDateDisplay(d.dateStart), fmtDateDisplay(d.dateEnd), d.duration, c.unit,
+          c.rate, c.qty,
+          c.budget, c.budgetKzt, +c.dailyBudget.toFixed(2),
+          c.imp, c.clicks, +(c.ctr/100).toFixed(5), +c.cpc.toFixed(2), +(c.cr/100).toFixed(4),
+          c.conversions, +c.cpl.toFixed(2)
+        ]);
+        totBudget += c.budget; totBudgetKzt += c.budgetKzt;
+        totDaily += c.dailyBudget; totImp += c.imp; totClicks += c.clicks;
+        totConv += c.conversions;
+      });
+    });
+
+    // Totals
+    const avgCTR = totClicks > 0 && totImp > 0 ? totClicks/totImp : 0;
+    const avgCPC = totClicks > 0 ? totBudget/totClicks : 0;
+    const avgCR  = totClicks > 0 ? totConv/totClicks : 0;
+    const avgCPL = totConv > 0 ? totBudget/totConv : 0;
+    rows.push([
+      'ИТОГО','','','','','','','','','', '',
+      +totBudget.toFixed(2), Math.round(totBudgetKzt), +totDaily.toFixed(2),
+      totImp, totClicks, +avgCTR.toFixed(5), +avgCPC.toFixed(2), +avgCR.toFixed(4),
+      totConv, +avgCPL.toFixed(2)
+    ]);
+
+    rows.push([]); // spacer
+    if (d.notes) rows.push([`* ${d.notes}`]);
+
+    const ws1 = XLSX.utils.aoa_to_sheet(rows);
+
+    // Column widths
+    ws1['!cols'] = [
+      {wch:4},{wch:22},{wch:26},{wch:18},{wch:12},
+      {wch:12},{wch:12},{wch:8},{wch:18},{wch:10},{wch:12},
+      {wch:12},{wch:14},{wch:13},
+      {wch:14},{wch:13},{wch:8},{wch:9},{wch:8},{wch:10},{wch:9}
+    ];
+    XLSX.utils.book_append_sheet(wb, ws1, 'Медиаплан');
+
+    // ── Sheet 2: Семантика ──────────────────────────────────────
+    if (d.keywords.trim()) {
+      const semRows = [['№','Ключевое слово','Тип соответствия','Статус','Комментарий']];
+      const kws = d.keywords.split('\n').filter(k => k.trim());
+      kws.forEach((kw, i) => {
+        const isNeg = kw.trim().startsWith('-');
+        semRows.push([
+          i+1,
+          kw.trim().replace(/^-/,''),
+          isNeg ? 'Минус-слово' : d.matchType,
+          isNeg ? 'Минус-слово' : 'Активен',
+          i === 0 ? d.semComment : ''
+        ]);
+      });
+      const ws2 = XLSX.utils.aoa_to_sheet(semRows);
+      ws2['!cols'] = [{wch:4},{wch:38},{wch:16},{wch:14},{wch:30}];
+      XLSX.utils.book_append_sheet(wb, ws2, 'Семантика');
+    }
+
+    // ── Sheet 3: Настройки ──────────────────────────────────────
+    const cfgRows = [
+      ['НАСТРОЙКИ'],
+      ['Клиент', d.client],
+      ['Бренд', d.brand],
+      ['Агентство', d.agency],
+      ['Регион', d.region],
+      ['Сайт', d.website],
+      ['Instagram', d.instagram],
+      ['Начало', fmtDateDisplay(d.dateStart)],
+      ['Конец', fmtDateDisplay(d.dateEnd)],
+      ['Длительность (дн.)', d.duration],
+      ['Курс USD/KZT', d.rate],
+    ];
+    const ws3 = XLSX.utils.aoa_to_sheet(cfgRows);
+    ws3['!cols'] = [{wch:22},{wch:40}];
+    XLSX.utils.book_append_sheet(wb, ws3, 'Настройки');
+
+    const filename = `Медиаплан_${d.client.replace(/\s+/g,'_')}_${fmtDateDisplay(d.dateStart).replace(/\./g,'-')}.xlsx`;
+    XLSX.writeFile(wb, filename);
+    showToast('✅ Excel готов — файл скачан', 'success');
+  } catch(e) {
+    showToast('Ошибка при создании Excel: ' + e.message, 'error');
+    console.error(e);
+  }
+  btn.classList.remove('loading');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PDF EXPORT
+// ═══════════════════════════════════════════════════════════════
+async function exportPDF(btn) {
+  if (!validate()) return;
+  btn.classList.add('loading');
+  await sleep(100);
+  try {
+    const d = collectData();
+    const el = document.getElementById('pdf-render');
+    el.innerHTML = buildPDFHTML(d);
+    el.style.left = '0';
+    el.style.top = '0';
+    el.style.zIndex = '9999';
+    el.style.display = 'block';
+
+    await sleep(300);
+
+    const canvas = await html2canvas(el, {
+      scale: 1.8,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      windowWidth: 1100,
+    });
+
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const imgW = canvas.width;
+    const imgH = canvas.height;
+    const ratio = pageW / imgW;
+    const scaledH = imgH * ratio;
+
+    if (scaledH <= pageH) {
+      pdf.addImage(imgData, 'JPEG', 0, 0, pageW, scaledH);
+    } else {
+      // Multi-page
+      let y = 0;
+      while (y < imgH) {
+        const sliceH = Math.min(pageH / ratio, imgH - y);
+        const sliceCanvas = document.createElement('canvas');
+        sliceCanvas.width = imgW;
+        sliceCanvas.height = sliceH;
+        const ctx = sliceCanvas.getContext('2d');
+        ctx.drawImage(canvas, 0, y, imgW, sliceH, 0, 0, imgW, sliceH);
+        const sliceData = sliceCanvas.toDataURL('image/jpeg', 0.95);
+        if (y > 0) pdf.addPage();
+        pdf.addImage(sliceData, 'JPEG', 0, 0, pageW, sliceH * ratio);
+        y += sliceH;
+      }
+    }
+
+    const filename = `Медиаплан_${d.client.replace(/\s+/g,'_')}_${fmtDateDisplay(d.dateStart).replace(/\./g,'-')}.pdf`;
+    pdf.save(filename);
+    showToast('✅ PDF готов — файл скачан', 'success');
+  } catch(e) {
+    showToast('Ошибка при создании PDF: ' + e.message, 'error');
+    console.error(e);
+  }
+  const el = document.getElementById('pdf-render');
+  el.style.display = 'none';
+  el.style.left = '-9999px';
+  btn.classList.remove('loading');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PDF HTML BUILDER
+// ═══════════════════════════════════════════════════════════════
+function buildPDFHTML(d) {
+  const totalBudget = d.platforms.reduce((s,pl)=>s+pl.campaigns.reduce((ss,c)=>ss+c.budget,0),0);
+  const totalBudgetKzt = d.platforms.reduce((s,pl)=>s+pl.campaigns.reduce((ss,c)=>ss+c.budgetKzt,0),0);
+  const totalImp = d.platforms.reduce((s,pl)=>s+pl.campaigns.reduce((ss,c)=>ss+c.imp,0),0);
+  const totalClicks = d.platforms.reduce((s,pl)=>s+pl.campaigns.reduce((ss,c)=>ss+c.clicks,0),0);
+  const totalConv = d.platforms.reduce((s,pl)=>s+pl.campaigns.reduce((ss,c)=>ss+c.conversions,0),0);
+  const avgCPC = totalClicks > 0 ? totalBudget/totalClicks : 0;
+  const avgCPL = totalConv > 0 ? totalBudget/totalConv : 0;
+
+  const pn = (n, dec=2) => (n||0).toLocaleString('ru-RU', {maximumFractionDigits:dec, minimumFractionDigits: dec});
+  const pi = (n) => (n||0).toLocaleString('ru-RU', {maximumFractionDigits:0});
+
+  const PCOLORS = { 'Meta (Facebook / Instagram)': '#1877F2', 'Google Ads': '#34A853', 'TikTok Ads': '#EE1D52', 'Яндекс.Директ': '#D4A800' };
+
+  let rowNum = 1;
+  const dataRows = d.platforms.flatMap(pl => {
+    const pColor = PCOLORS[pl.name] || '#7C6FCD';
+    const pBg = pColor + '18';
+    return [
+      // Platform header
+      `<tr><td colspan="21" style="background:${pColor};color:#fff;font-weight:700;font-size:11px;padding:7px 10px;letter-spacing:0.04em">${pl.name.toUpperCase()}</td></tr>`,
+      // Campaigns
+      ...pl.campaigns.map(c => `
+        <tr style="background:${pBg}">
+          <td style="text-align:center;color:#888">${rowNum++}</td>
+          <td style="color:${pColor};font-weight:600">${pl.name}</td>
+          <td>${c.type}</td>
+          <td>${c.audience}</td>
+          <td>${c.lang}</td>
+          <td style="text-align:center">${fmtDateDisplay(d.dateStart)}</td>
+          <td style="text-align:center">${fmtDateDisplay(d.dateEnd)}</td>
+          <td style="text-align:center">${d.duration}</td>
+          <td>${c.unit}</td>
+          <td style="text-align:right">${pn(c.rate,2)}</td>
+          <td style="text-align:right">${pi(c.qty)}</td>
+          <td style="text-align:right;font-weight:600">$${pn(c.budget)}</td>
+          <td style="text-align:right">${pi(c.budgetKzt)} ₸</td>
+          <td style="text-align:right">$${pn(c.dailyBudget)}</td>
+          <td style="text-align:right">${pi(c.imp)}</td>
+          <td style="text-align:right">${pi(c.clicks)}</td>
+          <td style="text-align:right">${pn(c.ctr,2)}%</td>
+          <td style="text-align:right">$${pn(c.cpc)}</td>
+          <td style="text-align:right">${pn(c.cr,1)}%</td>
+          <td style="text-align:right">${pi(c.conversions)}</td>
+          <td style="text-align:right">$${pn(c.cpl)}</td>
+        </tr>`)
+    ];
+  }).join('');
+
+  const avgCTR = totalClicks > 0 && totalImp > 0 ? (totalClicks/totalImp*100) : 0;
+  const avgCR  = totalClicks > 0 ? (totalConv/totalClicks*100) : 0;
+
+  return `
+  <div style="font-family:'Golos Text',Arial,sans-serif;font-size:10px;color:#1A1A2E;width:1080px;padding:24px 28px;background:#fff">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;padding-bottom:14px;border-bottom:2px solid #1A1A2E">
+      <div>
+        <div style="font-size:20px;font-weight:800;letter-spacing:-0.02em;color:#1A1A2E;line-height:1.1">МЕДИАПЛАН</div>
+        <div style="font-size:12px;color:#6C63FF;font-weight:600;margin-top:3px">${d.client}</div>
+      </div>
+      <div style="text-align:right;font-size:9px;color:#888;line-height:1.8">
+        <div>Период: <strong style="color:#1A1A2E">${fmtDateDisplay(d.dateStart)} — ${fmtDateDisplay(d.dateEnd)}</strong> (${d.duration} дн.)</div>
+        <div>Регион: <strong style="color:#1A1A2E">${d.region}</strong></div>
+        ${d.agency ? `<div>Агентство: <strong style="color:#1A1A2E">${d.agency}</strong></div>` : ''}
+        <div>Курс USD/KZT: <strong style="color:#1A1A2E">${d.rate}</strong></div>
+      </div>
+    </div>
+
+    <!-- KPI summary chips -->
+    <div style="display:flex;gap:10px;margin-bottom:16px">
+      ${[
+        ['Общий бюджет', `$${pn(totalBudget)}`, '#6C63FF'],
+        ['Бюджет в тенге', `${pi(totalBudgetKzt)} ₸`, '#1877F2'],
+        ['Прогноз показов', pi(totalImp), '#34A853'],
+        ['Прогноз кликов', pi(totalClicks), '#FFCC00'],
+        ['Прогноз конверсий', pi(totalConv), '#EE1D52'],
+        ['Средний CPC', `$${pn(avgCPC)}`, '#A78BFA'],
+        ['Средний CPL', `$${pn(avgCPL)}`, '#FF7043'],
+      ].map(([label, val, color]) => `
+        <div style="flex:1;background:${color}18;border:1px solid ${color}44;border-radius:8px;padding:8px 10px">
+          <div style="font-size:8px;color:#888;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px">${label}</div>
+          <div style="font-size:13px;font-weight:700;color:${color}">${val}</div>
+        </div>`).join('')}
+    </div>
+
+    <!-- Main table -->
+    <table style="width:100%;border-collapse:collapse;font-size:9px">
+      <thead>
+        <tr style="background:#1A1A2E;color:#fff">
+          ${['№','Платформа','Тип кампании','Аудитория','Язык','Начало','Конец','Дн.','Формат',
+            'Ставка','Кол-во','Бюджет $','Бюджет ₸','Дн.бюдж','Показы','Клики',
+            'CTR','CPC','CR','Конв.','CPL'].map(h =>
+            `<th style="padding:7px 5px;text-align:${['Ставка','Кол-во','Бюджет $','Бюджет ₸','Дн.бюдж','Показы','Клики','CTR','CPC','CR','Конв.','CPL'].includes(h)?'right':'left'};white-space:nowrap">${h}</th>`
+          ).join('')}
+        </tr>
+      </thead>
+      <tbody>
+        ${dataRows}
+        <!-- ИТОГО -->
+        <tr style="background:#1A1A2E;color:#fff;font-weight:700">
+          <td colspan="11" style="padding:8px 10px;font-size:10px">ИТОГО</td>
+          <td style="text-align:right;padding:8px 5px">$${pn(totalBudget)}</td>
+          <td style="text-align:right;padding:8px 5px">${pi(totalBudgetKzt)} ₸</td>
+          <td style="padding:8px 5px"></td>
+          <td style="text-align:right;padding:8px 5px">${pi(totalImp)}</td>
+          <td style="text-align:right;padding:8px 5px">${pi(totalClicks)}</td>
+          <td style="text-align:right;padding:8px 5px">${pn(avgCTR,2)}%</td>
+          <td style="text-align:right;padding:8px 5px">$${pn(avgCPC)}</td>
+          <td style="text-align:right;padding:8px 5px">${pn(avgCR,1)}%</td>
+          <td style="text-align:right;padding:8px 5px">${pi(totalConv)}</td>
+          <td style="text-align:right;padding:8px 5px">$${pn(avgCPL)}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    ${d.notes ? `<div style="margin-top:14px;padding:10px 14px;background:#F5F6FA;border-left:3px solid #6C63FF;border-radius:4px;font-size:8px;color:#666;line-height:1.6">* ${d.notes}</div>` : ''}
+
+    <div style="margin-top:14px;display:flex;justify-content:space-between;font-size:8px;color:#aaa;border-top:1px solid #eee;padding-top:10px">
+      <span>${d.agency} · Медиаплан сформирован автоматически</span>
+      <span>Дата создания: ${new Date().toLocaleDateString('ru-RU')}</span>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// VALIDATION
+// ═══════════════════════════════════════════════════════════════
+function validate() {
+  const client = document.getElementById('client').value.trim();
+  const ds = document.getElementById('date-start').value;
+  const de = document.getElementById('date-end').value;
+  if (!client) { showToast('Укажите название клиента', 'error'); return false; }
+  if (!ds || !de) { showToast('Укажите период кампании', 'error'); return false; }
+  if (new Date(de) < new Date(ds)) { showToast('Дата окончания раньше начала', 'error'); return false; }
+  if (addedPlatforms.length === 0) { showToast('Добавьте хотя бы одну платформу', 'error'); return false; }
+  return true;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.className = `toast ${type}`;
+  t.innerHTML = (type==='success'?'✅':'❌') + ` <span>${msg}</span>`;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+</script>
+</body>
+</html>
